@@ -24,4 +24,4 @@
 
 ## API proxy
 
-The dashboard calls `/api/tollring?path=GetLiveCalls` (and other paths). The Netlify function forwards requests to `https://4reports.4com.im/api/v4` with credentials from environment variables.
+The dashboard calls `/api/tollring?path=GetLiveCalls` (and other paths). The Netlify function forwards requests to the 4com iCall Suite API with credentials from environment variables.

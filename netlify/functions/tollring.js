@@ -1,5 +1,17 @@
+const MIN_GAP_MS = 6000;
+let lastRequestAt = 0;
+
+async function waitForGap() {
+  const now = Date.now();
+  const elapsed = now - lastRequestAt;
+  if (lastRequestAt > 0 && elapsed < MIN_GAP_MS) {
+    await new Promise(r => setTimeout(r, MIN_GAP_MS - elapsed));
+  }
+  lastRequestAt = Date.now();
+}
+
 exports.handler = async (event) => {
-  const TOLLRING_BASE = 'https://4reports.4com.im/api/v4';
+  const ICALL_API_ROOT = 'https://4reports.4com.im/api/v4';
 
   // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
@@ -44,7 +56,9 @@ exports.handler = async (event) => {
   const method = event.httpMethod === 'POST' ? 'POST' : 'GET';
 
   try {
-    const response = await fetch(`${TOLLRING_BASE}/${path}`, {
+    await waitForGap();
+
+    const response = await fetch(`${ICALL_API_ROOT}/${path}`, {
       method,
       headers: {
         'Authorization': auth,
