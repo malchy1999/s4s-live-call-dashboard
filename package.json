@@ -2,8 +2,7 @@
   "name": "s4s-live-call-dashboard",
   "private": true,
   "scripts": {
-    "dev": "netlify dev",
-    "dev:static": "npx --yes serve . -l 3000"
+    "dev": "netlify dev"
   },
   "devDependencies": {
     "netlify-cli": "^22.0.0"

@@ -52,6 +52,64 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    body.has-error-banner { padding-top: 48px; }
+    body.has-error-banner .dashboard { padding-top: 12px; }
+
+    /* Setup panel */
+    .setup-panel {
+      display: none;
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .setup-panel.visible { display: block; }
+    .setup-panel h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #92400e;
+      margin-bottom: 8px;
+    }
+    .setup-panel p {
+      font-size: 13px;
+      color: #78350f;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .setup-panel ol {
+      margin: 0 0 16px 20px;
+      font-size: 13px;
+      color: #78350f;
+      line-height: 1.6;
+    }
+    .setup-panel code {
+      background: rgba(0,0,0,0.06);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .setup-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .setup-btn {
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    .setup-btn.primary {
+      background: var(--accent-primary);
+      color: #fff;
+    }
+    .setup-btn.secondary {
+      background: #fff;
+      border-color: #fcd34d;
+      color: #92400e;
+    }
+
     /* Error banner */
     .error-banner {
       display: none;
@@ -800,6 +858,21 @@
       </div>
     </header>
 
+    <div class="setup-panel" id="setupPanel">
+      <h3>API not connected</h3>
+      <p id="setupPanelMsg">Tollring credentials are missing or incorrect.</p>
+      <ol>
+        <li><strong>Username</strong> must be your iCall Suite <em>API user email</em>, not your portal password.</li>
+        <li><strong>Token</strong> must be the API token ID from iCall Suite (Admin / API settings). Copy it exactly, with no spaces.</li>
+        <li><strong>Base URL</strong> must match your iCall Suite host, ending in <code>/api/v4</code>.</li>
+        <li>Regenerate the API token in iCall Suite if unsure, then update Netlify env vars and redeploy.</li>
+      </ol>
+      <div class="setup-actions">
+        <button class="setup-btn primary" onclick="retryConnection()">Retry connection</button>
+        <button class="setup-btn secondary" onclick="enableDemoPreview()">Preview with demo data</button>
+      </div>
+    </div>
+
     <!-- KPI Row -->
     <div class="kpi-row" id="kpiRow">
       <div class="kpi-tile blue" id="kpiTotal">
@@ -1074,10 +1147,27 @@
     function showError(msg) {
       document.getElementById('errorMessage').textContent = msg;
       document.getElementById('errorBanner').classList.add('visible');
+      document.body.classList.add('has-error-banner');
     }
 
     function hideError() {
       document.getElementById('errorBanner').classList.remove('visible');
+      document.body.classList.remove('has-error-banner');
+    }
+
+    function showSetupPanel(message) {
+      document.getElementById('setupPanelMsg').textContent = message;
+      document.getElementById('setupPanel').classList.add('visible');
+    }
+
+    function hideSetupPanel() {
+      document.getElementById('setupPanel').classList.remove('visible');
+    }
+
+    function enableDemoPreview() {
+      hideSetupPanel();
+      hideError();
+      activateDemoMode('Showing demo data. Connect the API for live calls.');
     }
 
     function setKpiValue(id, val, subId, subText, subClass) {
@@ -1154,7 +1244,9 @@
       }
 
       if (res.status === 401 || res.status === 403) {
-        throw new Error('AUTH_FAILED');
+        const detail = data.detail ? ` ${data.detail}` : '';
+        const hint = data.hint ? ` ${data.hint}` : '';
+        throw new Error('AUTH_FAILED:' + (data.message || 'Tollring rejected the credentials.') + detail + hint);
       }
       if (res.status === 503 && data.error === 'DEMO_MODE') {
         throw new Error('DEMO_MODE');
@@ -1180,11 +1272,19 @@
         return true;
       }
       if (err.message.startsWith('CONFIG:')) {
-        showError(err.message.slice(7));
+        const msg = err.message.slice(7);
+        showError(msg);
+        showSetupPanel(msg);
+        renderEmptyDashboard();
         return true;
       }
-      if (err.message === 'AUTH_FAILED') {
-        showError('Tollring rejected the credentials. Check TOLLRING_USERNAME and TOLLRING_TOKEN in your environment variables.');
+      if (err.message === 'AUTH_FAILED' || err.message.startsWith('AUTH_FAILED:')) {
+        const msg = err.message.startsWith('AUTH_FAILED:')
+          ? err.message.slice('AUTH_FAILED:'.length)
+          : 'Tollring rejected the credentials. Check TOLLRING_USERNAME and TOLLRING_TOKEN in your environment variables.';
+        showError(msg);
+        showSetupPanel(msg);
+        renderEmptyDashboard();
         return true;
       }
       if (err.message.startsWith('API_ERROR:')) {
@@ -1201,6 +1301,7 @@
         const data = await queuedFetch('/live-calls', 'GET');
         lastKnownData.live = data;
         hideError();
+        hideSetupPanel();
         return data;
       } catch (e) {
         handleApiFailure('GetLiveCalls', e);
@@ -1220,6 +1321,7 @@
           lastKnownData.today = data;
         }
         hideError();
+        hideSetupPanel();
         return Array.isArray(data) ? data : (data.Calls || data.calls || []);
       } catch (e) {
         handleApiFailure('GetCallsByDate', e);
@@ -1232,15 +1334,32 @@
       isDemoMode = true;
       enableDemoBadge();
       hideError();
+      hideSetupPanel();
       showToast(reason || 'Running in demo mode');
       initDemoData();
     }
 
+    function renderEmptyDashboard() {
+      renderKpis([], [], 0);
+      renderDdiTable({}, {});
+      renderChart(new Array(24).fill(0), new Array(24).fill(0));
+      renderLiveCalls([]);
+      renderRecentCalls([]);
+      renderDonutCompare(0, 0);
+      renderDonutMissed(0, 0);
+      document.getElementById('topPerformerName').textContent = '--';
+      document.getElementById('topPerformerCount').textContent = '0';
+      document.getElementById('topPerformerSub').textContent = 'Waiting for API connection';
+    }
+
     function retryConnection() {
       hideError();
+      hideSetupPanel();
       isDemoMode = false;
+      document.getElementById('demoBadge').style.display = 'none';
       pollLiveCalls();
       pollTodayData();
+      pollYesterdayData();
     }
 
     // ============================================================

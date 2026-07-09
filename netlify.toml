@@ -2,16 +2,12 @@
   publish = "."
   functions = "netlify/functions"
 
-[dev]
-  framework = "#static"
-  targetPort = 3000
-
 [[redirects]]
-  from = "/api/live-calls"
-  to = "/.netlify/functions/get-live-calls"
+  from = "/api/tollring"
+  to   = "/.netlify/functions/tollring"
   status = 200
 
 [[redirects]]
-  from = "/api/calls-by-date"
-  to = "/.netlify/functions/get-calls-by-date"
+  from = "/api/tollring/*"
+  to   = "/.netlify/functions/tollring"
   status = 200
