@@ -1,0 +1,1842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>S4S Live Call Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-page: #f0f4f8;
+      --bg-page-accent: #e8eef5;
+      --bg-card: #ffffff;
+      --bg-subtle: #f8fafc;
+      --border-card: #e2e8f0;
+      --border-light: #f1f5f9;
+      --accent-primary: #0d77fe;
+      --accent-primary-light: rgba(13, 119, 254, 0.08);
+      --accent-brand: #e6b800;
+      --accent-brand-light: rgba(255, 212, 38, 0.15);
+      --success: #059669;
+      --success-light: rgba(5, 150, 105, 0.1);
+      --warning: #d97706;
+      --warning-light: rgba(217, 119, 6, 0.1);
+      --danger: #dc2626;
+      --danger-light: rgba(220, 38, 38, 0.1);
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+      --purple: #7c3aed;
+      --purple-light: rgba(124, 58, 237, 0.08);
+      --pink: #db2777;
+      --pink-light: rgba(219, 39, 119, 0.08);
+      --font: 'Inter', sans-serif;
+      --radius: 14px;
+      --radius-sm: 8px;
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+      --shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 4px 16px rgba(15, 23, 42, 0.04);
+      --shadow-lg: 0 4px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: linear-gradient(160deg, var(--bg-page) 0%, var(--bg-page-accent) 50%, #eef2f7 100%);
+      background-attachment: fixed;
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Error banner */
+    .error-banner {
+      display: none;
+      background: var(--danger);
+      color: #fff;
+      padding: 10px 24px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      box-shadow: var(--shadow-lg);
+    }
+    .error-banner.visible { display: flex; }
+    .error-banner button {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      color: #fff;
+      padding: 4px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: var(--font);
+      font-size: 13px;
+    }
+    .error-banner button:hover { background: rgba(255,255,255,0.3); }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 60px;
+      right: 24px;
+      z-index: 1001;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .toast {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      color: var(--text-secondary);
+      padding: 12px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      box-shadow: var(--shadow-lg);
+      animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+      max-width: 320px;
+    }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes toastOut { to { opacity: 0; transform: translateX(40px); } }
+
+    /* Layout */
+    .dashboard {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px 28px 80px;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 28px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius);
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+      box-shadow: var(--shadow);
+    }
+    .header-left { display: flex; align-items: center; gap: 24px; }
+    .logo { display: flex; flex-direction: column; line-height: 1.1; }
+    .logo-s4s {
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--accent-primary);
+      letter-spacing: -1px;
+    }
+    .logo-s4s span { color: var(--accent-brand); }
+    .logo-sub {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    .header-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      border-left: 2px solid var(--border-card);
+      padding-left: 24px;
+    }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding-left: 16px;
+      border-left: 1px solid var(--border-card);
+    }
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--success-light);
+      border: 1px solid rgba(5, 150, 105, 0.2);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--success);
+      letter-spacing: 1px;
+    }
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.4); }
+      50% { transform: scale(1.2); opacity: 0.8; box-shadow: 0 0 0 6px rgba(5, 150, 105, 0); }
+    }
+    .demo-badge {
+      background: var(--accent-brand-light);
+      border: 1px solid rgba(230, 184, 0, 0.35);
+      color: #92680a;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .weather-display {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 14px;
+      background: var(--bg-subtle);
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+    }
+    .weather-display .temp { color: var(--text-primary); font-weight: 600; }
+    .clock-display {
+      text-align: right;
+      background: var(--bg-subtle);
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+    }
+    .clock-time {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.2;
+    }
+    .clock-date {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 500;
+    }
+
+    /* KPI Row */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .kpi-tile {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .kpi-tile:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-1px);
+    }
+    .kpi-tile::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px;
+      height: 100%;
+      border-radius: var(--radius) 0 0 var(--radius);
+    }
+    .kpi-tile.blue::before { background: var(--accent-primary); }
+    .kpi-tile.green::before { background: var(--success); }
+    .kpi-tile.purple::before { background: var(--purple); }
+    .kpi-tile.orange::before { background: var(--warning); }
+    .kpi-tile.pink::before { background: var(--pink); }
+    .kpi-tile.blue { background: linear-gradient(135deg, #fff 70%, var(--accent-primary-light)); }
+    .kpi-tile.green { background: linear-gradient(135deg, #fff 70%, var(--success-light)); }
+    .kpi-tile.purple { background: linear-gradient(135deg, #fff 70%, var(--purple-light)); }
+    .kpi-tile.orange { background: linear-gradient(135deg, #fff 70%, var(--warning-light)); }
+    .kpi-tile.pink { background: linear-gradient(135deg, #fff 70%, var(--pink-light)); }
+    .kpi-tile.pulse-live {
+      animation: kpiPulse 2s ease-in-out infinite;
+      border-color: rgba(5, 150, 105, 0.3);
+    }
+    @keyframes kpiPulse {
+      0%, 100% { box-shadow: var(--shadow-sm); }
+      50% { box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12), var(--shadow); }
+    }
+    .kpi-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .kpi-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .kpi-tile.blue .kpi-icon { background: var(--accent-primary-light); }
+    .kpi-tile.green .kpi-icon { background: var(--success-light); }
+    .kpi-tile.purple .kpi-icon { background: var(--purple-light); }
+    .kpi-tile.orange .kpi-icon { background: var(--warning-light); }
+    .kpi-tile.pink .kpi-icon { background: var(--pink-light); }
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .kpi-value {
+      font-size: 34px;
+      font-weight: 800;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      transition: color 0.2s;
+      letter-spacing: -0.5px;
+    }
+    .kpi-value.flash { animation: valueFlash 0.6s ease; }
+    @keyframes valueFlash {
+      0%, 100% { color: var(--text-primary); }
+      30% { color: var(--accent-primary); }
+    }
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      font-weight: 500;
+    }
+    .kpi-sub.up { color: var(--success); }
+    .kpi-sub.down { color: var(--danger); }
+    .goal-badge {
+      display: inline-block;
+      background: var(--success-light);
+      color: var(--success);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-left: 6px;
+      vertical-align: middle;
+      border: 1px solid rgba(5, 150, 105, 0.15);
+    }
+
+    /* Main grid */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr 280px;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* DDI Table */
+    .ddi-table { width: 100%; border-collapse: collapse; }
+    .ddi-table th {
+      text-align: left;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border-card);
+      background: var(--bg-subtle);
+    }
+    .ddi-table th:first-child { border-radius: var(--radius-sm) 0 0 0; }
+    .ddi-table th:last-child { border-radius: 0 var(--radius-sm) 0 0; }
+    .ddi-table td {
+      padding: 11px 10px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: middle;
+    }
+    .ddi-table tbody tr { transition: background 0.15s; }
+    .ddi-table tbody tr:hover { background: var(--bg-subtle); }
+    .ddi-table tr:last-child td { border-bottom: none; }
+    .ddi-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      background: var(--accent-primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .ddi-name { font-weight: 600; color: var(--text-primary); }
+    .ddi-number { color: var(--text-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+    .ddi-count {
+      font-weight: 700;
+      font-size: 16px;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-primary);
+    }
+    .ddi-count.flash { animation: valueFlash 0.6s ease; }
+    .pct-change { font-size: 12px; font-weight: 600; }
+    .pct-change.up { color: var(--success); }
+    .pct-change.down { color: var(--danger); }
+    .pct-change.neutral { color: var(--text-muted); }
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.8);
+    }
+    .status-dot.idle { background: var(--success); }
+    .status-dot.ringing { background: var(--warning); animation: pulse 1s ease-in-out infinite; }
+    .status-dot.incall { background: var(--danger); }
+    .view-all-btn {
+      display: block;
+      width: 100%;
+      margin-top: 14px;
+      padding: 10px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-sm);
+      color: var(--accent-primary);
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .view-all-btn:hover {
+      background: var(--accent-primary-light);
+      border-color: rgba(13, 119, 254, 0.25);
+    }
+
+    /* Chart */
+    .chart-container { position: relative; }
+    .chart-select {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-card);
+      color: var(--text-secondary);
+      font-family: var(--font);
+      font-size: 12px;
+      padding: 5px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+    .chart-select:focus { outline: 2px solid var(--accent-primary-light); border-color: var(--accent-primary); }
+    .chart-svg { width: 100%; height: 210px; display: block; }
+    .chart-tooltip {
+      position: absolute;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      color: var(--text-secondary);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      white-space: nowrap;
+      z-index: 10;
+      box-shadow: var(--shadow-lg);
+    }
+    .chart-tooltip.visible { opacity: 1; }
+    .chart-legend {
+      display: flex;
+      gap: 20px;
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-line { width: 20px; height: 3px; border-radius: 2px; }
+    .legend-line.today { background: var(--accent-primary); }
+    .legend-line.yesterday { background: #94a3b8; }
+
+    /* Right column widgets */
+    .right-col { display: flex; flex-direction: column; gap: 16px; }
+    .widget { padding: 18px; }
+    .widget .card-header {
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+    }
+    .donut-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .donut-svg { width: 120px; height: 120px; }
+    .donut-center {
+      font-size: 22px;
+      font-weight: 800;
+      fill: var(--text-primary);
+    }
+    .donut-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      font-weight: 500;
+    }
+    .top-performer-name {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--accent-primary);
+      margin: 6px 0 4px;
+      text-align: center;
+    }
+    .top-performer-count {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text-primary);
+      text-align: center;
+      letter-spacing: -0.5px;
+    }
+    .top-performer-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      text-align: center;
+      font-weight: 500;
+    }
+    .top-performer-sub.up { color: var(--success); }
+    .top-performer-sub.down { color: var(--danger); }
+    .trophy {
+      font-size: 32px;
+      text-align: center;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.08));
+    }
+
+    /* Bottom grid */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* Live calls list */
+    .call-list { list-style: none; }
+    .call-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--border-light);
+      position: relative;
+      border-radius: var(--radius-sm);
+      transition: background 0.15s;
+    }
+    .call-item:hover { background: var(--bg-subtle); }
+    .call-item:last-child { border-bottom: none; }
+    .call-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    }
+    .call-info { flex: 1; min-width: 0; }
+    .call-info-name { font-weight: 600; font-size: 13px; color: var(--text-primary); }
+    .call-info-num { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .call-timer {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      min-width: 50px;
+      text-align: right;
+    }
+    .status-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .status-badge.ringing { background: var(--warning-light); color: var(--warning); border: 1px solid rgba(217,119,6,0.15); }
+    .status-badge.incall { background: var(--success-light); color: var(--success); border: 1px solid rgba(5,150,105,0.15); }
+    .status-badge.connecting { background: var(--accent-primary-light); color: var(--accent-primary); border: 1px solid rgba(13,119,254,0.15); }
+    .call-loading-bar {
+      position: absolute;
+      bottom: 0;
+      left: 12px;
+      right: 12px;
+      height: 2px;
+      border-radius: 1px;
+      background: linear-gradient(90deg, var(--accent-primary), var(--pink), var(--success), var(--accent-primary));
+      background-size: 300% 100%;
+      animation: loadingBar 2s linear infinite;
+      opacity: 0.6;
+    }
+    @keyframes loadingBar {
+      0% { background-position: 0% 0; }
+      100% { background-position: 300% 0; }
+    }
+    .empty-state {
+      text-align: center;
+      padding: 40px 16px;
+      color: var(--text-muted);
+    }
+    .empty-state-icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+      animation: idleFloat 3s ease-in-out infinite;
+      opacity: 0.7;
+    }
+    @keyframes idleFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    /* Recent calls */
+    .recent-table { width: 100%; border-collapse: collapse; }
+    .recent-table th {
+      text-align: left;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border-card);
+      background: var(--bg-subtle);
+    }
+    .recent-table th:first-child { border-radius: var(--radius-sm) 0 0 0; }
+    .recent-table th:last-child { border-radius: 0 var(--radius-sm) 0 0; }
+    .recent-table td {
+      padding: 10px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-light);
+    }
+    .recent-table tbody tr { transition: background 0.15s; }
+    .recent-table tbody tr:hover { background: var(--bg-subtle); }
+    .recent-table tr:last-child td { border-bottom: none; }
+    .dir-icon {
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+    }
+    .dir-inc { color: var(--success); background: var(--success-light); }
+    .dir-out { color: var(--accent-primary); background: var(--accent-primary-light); }
+    .dir-missed { color: var(--danger); background: var(--danger-light); }
+
+    /* Footer ticker */
+    .footer-ticker {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border-card);
+      height: 44px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      z-index: 100;
+      box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.06);
+    }
+    .ticker-label {
+      flex-shrink: 0;
+      background: var(--accent-primary);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 0 18px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      text-transform: uppercase;
+    }
+    .ticker-track {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      height: 100%;
+      background: var(--bg-subtle);
+    }
+    .ticker-content {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      white-space: nowrap;
+      animation: tickerScroll 40s linear infinite;
+    }
+    .ticker-content:hover { animation-play-state: paused; }
+    @keyframes tickerScroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 28px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .ticker-item .t-time { color: var(--text-primary); font-weight: 600; font-variant-numeric: tabular-nums; }
+    .ticker-item .t-ddi { color: var(--accent-primary); font-weight: 600; }
+
+    /* Skeleton loading */
+    .skeleton {
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 6px;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .skeleton-kpi { height: 32px; width: 60%; margin-top: 8px; }
+    .loading .kpi-value { visibility: hidden; }
+    .loading .kpi-value + .skeleton-kpi,
+    .loading .skeleton-kpi { display: block; }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .kpi-row { grid-template-columns: repeat(3, 1fr); }
+      .main-grid { grid-template-columns: 1fr 1fr; }
+      .right-col { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; }
+      .right-col .card { flex: 1; min-width: 200px; }
+    }
+    @media (max-width: 1024px) {
+      .kpi-row { grid-template-columns: repeat(2, 1fr); }
+      .main-grid { grid-template-columns: 1fr; }
+      .bottom-grid { grid-template-columns: 1fr; }
+      .header { flex-direction: column; align-items: flex-start; }
+      .header-right { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+      .header-meta { border-left: none; padding-left: 0; }
+      .dashboard { padding: 16px 16px 80px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="error-banner" id="errorBanner">
+    <span id="errorMessage">Unable to connect to Tollring API</span>
+    <button onclick="retryConnection()">Retry</button>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <div class="dashboard">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">
+          <div class="logo-s4s">s<span>4</span>s</div>
+          <div class="logo-sub">Service4Service</div>
+        </div>
+        <div class="header-title">Live Call Dashboard</div>
+      </div>
+      <div class="header-right">
+        <div class="live-badge">
+          <div class="live-dot"></div>
+          LIVE
+        </div>
+        <div class="demo-badge" id="demoBadge" style="display:none;">DEMO MODE</div>
+        <div class="header-meta">
+          <div class="weather-display" id="weatherDisplay">
+            <span class="weather-icon" id="weatherIcon">--</span>
+            <span class="temp" id="weatherTemp">--</span>
+          </div>
+          <div class="clock-display">
+            <div class="clock-time" id="clockTime">--:--</div>
+            <div class="clock-date" id="clockDate">--</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- KPI Row -->
+    <div class="kpi-row" id="kpiRow">
+      <div class="kpi-tile blue" id="kpiTotal">
+        <div class="kpi-top"><div class="kpi-icon">&#128222;</div></div>
+        <div class="kpi-label">Total Calls Today</div>
+        <div class="kpi-value" id="kpiTotalVal">--</div>
+        <div class="kpi-sub" id="kpiTotalSub">Loading...</div>
+      </div>
+      <div class="kpi-tile green" id="kpiLive">
+        <div class="kpi-top"><div class="kpi-icon">&#128225;</div></div>
+        <div class="kpi-label">Live Calls Now</div>
+        <div class="kpi-value" id="kpiLiveVal">--</div>
+        <div class="kpi-sub" id="kpiLiveSub">Monitoring...</div>
+      </div>
+      <div class="kpi-tile purple" id="kpiAnswered">
+        <div class="kpi-top"><div class="kpi-icon">&#9989;</div></div>
+        <div class="kpi-label">Answered Today</div>
+        <div class="kpi-value" id="kpiAnsweredVal">--</div>
+        <div class="kpi-sub" id="kpiAnsweredSub">Loading...</div>
+      </div>
+      <div class="kpi-tile orange" id="kpiMissed">
+        <div class="kpi-top"><div class="kpi-icon">&#128683;</div></div>
+        <div class="kpi-label">Missed Calls</div>
+        <div class="kpi-value" id="kpiMissedVal">--</div>
+        <div class="kpi-sub" id="kpiMissedSub">Loading...</div>
+      </div>
+      <div class="kpi-tile pink" id="kpiAvgRt">
+        <div class="kpi-top"><div class="kpi-icon">&#9201;</div></div>
+        <div class="kpi-label">Avg Answer Time</div>
+        <div class="kpi-value" id="kpiAvgRtVal">--:--</div>
+        <div class="kpi-sub" id="kpiAvgRtSub">Loading...</div>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="main-grid">
+      <!-- DDI Table -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Calls Today by Number</div>
+        </div>
+        <table class="ddi-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Name</th>
+              <th>Number</th>
+              <th>Count</th>
+              <th>vs Yest.</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="ddiTableBody"></tbody>
+        </table>
+        <button class="view-all-btn">View all numbers &#8250;</button>
+      </div>
+
+      <!-- Chart -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Calls Throughout Today</div>
+          <select class="chart-select" id="chartSelect">
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+          </select>
+        </div>
+        <div class="chart-container" id="chartContainer">
+          <svg class="chart-svg" id="chartSvg" viewBox="0 0 600 200" preserveAspectRatio="none"></svg>
+          <div class="chart-tooltip" id="chartTooltip"></div>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-line today"></div> Today</div>
+          <div class="legend-item"><div class="legend-line yesterday"></div> Yesterday</div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="right-col">
+        <div class="card widget">
+          <div class="card-title" style="margin-bottom:12px;">Today vs Yesterday</div>
+          <div class="donut-wrap">
+            <svg class="donut-svg" id="donutCompare" viewBox="0 0 120 120"></svg>
+            <div class="donut-label" id="donutCompareLabel">-- today vs -- yesterday</div>
+          </div>
+        </div>
+        <div class="card widget">
+          <div class="card-title" style="margin-bottom:4px;">Top Performer</div>
+          <div class="trophy">&#127942;</div>
+          <div class="top-performer-name" id="topPerformerName">--</div>
+          <div class="top-performer-count" id="topPerformerCount">--</div>
+          <div class="top-performer-sub" id="topPerformerSub">--</div>
+        </div>
+        <div class="card widget">
+          <div class="card-title" style="margin-bottom:12px;">Missed Calls</div>
+          <div class="donut-wrap">
+            <svg class="donut-svg" id="donutMissed" viewBox="0 0 120 120"></svg>
+            <div class="donut-label" id="donutMissedLabel">Missed rate --</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Grid -->
+    <div class="bottom-grid">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Live Calls</div>
+        </div>
+        <ul class="call-list" id="liveCallsList"></ul>
+        <button class="view-all-btn">View all live calls &#8250;</button>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Recent Calls</div>
+        </div>
+        <table class="recent-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Number</th>
+              <th>Duration</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody id="recentCallsBody"></tbody>
+        </table>
+        <button class="view-all-btn">View full history &#8250;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Ticker -->
+  <div class="footer-ticker">
+    <div class="ticker-label">Latest Activity</div>
+    <div class="ticker-track">
+      <div class="ticker-content" id="tickerContent"></div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    // CONFIGURATION - edit these before going live
+    // ============================================================
+    const TOLLRING_USERNAME = 'YOUR_EMAIL@domain.com'; // CONFIGURE ME
+    const TOLLRING_TOKEN    = 'YOUR_TOKEN_ID_HERE';    // CONFIGURE ME
+    const TOLLRING_BASE     = 'https://YOUR_ICALLSUITE_HOST/api/v4'; // CONFIGURE ME
+    const DEMO_MODE         = true; // Set false when credentials are ready
+    const DEBUG             = false;
+
+    // Replace placeholder numbers with your real garage DDIs before going live
+    const DDI_LIST = [
+      { name: 'A1',         number: '01214501001', ddi: '+441214501001' },
+      { name: 'Beds',       number: '01214502001', ddi: '+441214502001' },
+      { name: 'Manchester', number: '01214503001', ddi: '+441214503001' },
+      { name: 'Bristol',    number: '01214504001', ddi: '+441214504001' },
+      { name: 'Main',       number: '01214505001', ddi: '+441214505001' },
+      { name: 'Leeds',      number: '01214506001', ddi: '+441214506001' },
+      { name: 'South-east', number: '01214507001', ddi: '+441214507001' },
+      { name: 'Midlands',   number: '01214508001', ddi: '+441214508001' },
+      { name: 'London',     number: '01214509001', ddi: '+441214509001' },
+    ];
+
+    const AVATAR_COLOURS = ['#0d77fe','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#f97316','#6366f1'];
+
+    // ============================================================
+    // STATE
+    // ============================================================
+    let isDemoMode = DEMO_MODE;
+    let todayCalls = [];
+    let yesterdayCalls = [];
+    let liveCalls = [];
+    let ddiStatuses = {};
+    let tickerEvents = [];
+    let prevKpiValues = {};
+    let lastKnownData = { today: [], yesterday: [], live: [] };
+    let demoInterval = null;
+    let liveTimerInterval = null;
+
+    DDI_LIST.forEach(d => { ddiStatuses[d.ddi] = 'idle'; });
+
+    // ============================================================
+    // UTILITIES
+    // ============================================================
+    function debug(msg) {
+      if (DEBUG) console.log('[S4S]', msg);
+    }
+
+    function getLondonParts(date) {
+      const fmt = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Europe/London',
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false
+      });
+      const parts = {};
+      fmt.formatToParts(date).forEach(p => { if (p.type !== 'literal') parts[p.type] = p.value; });
+      return parts;
+    }
+
+    function getLondonDateString(offsetDays) {
+      const d = new Date();
+      d.setDate(d.getDate() + (offsetDays || 0));
+      const p = getLondonParts(d);
+      return `${p.year}-${p.month}-${p.day}`;
+    }
+
+    function getDateRange(offsetDays) {
+      const ds = getLondonDateString(offsetDays || 0);
+      return { StartDate: `${ds} 00:00:00`, EndDate: `${ds} 23:59:59` };
+    }
+
+    function formatTime(seconds) {
+      const s = Math.max(0, Math.floor(seconds));
+      const m = Math.floor(s / 60);
+      const sec = s % 60;
+      return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+    }
+
+    function formatDuration(seconds) {
+      if (!seconds || seconds <= 0) return '0:00';
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60);
+      return `${m}:${String(s).padStart(2,'0')}`;
+    }
+
+    function pctChange(today, yesterday) {
+      if (yesterday === 0) return today > 0 ? 100 : 0;
+      return Math.round(((today - yesterday) / yesterday) * 100);
+    }
+
+    function formatPct(val) {
+      if (val > 0) return `\u2191 ${val}% vs yesterday`;
+      if (val < 0) return `\u2193 ${Math.abs(val)}% vs yesterday`;
+      return 'No change vs yesterday';
+    }
+
+    function findDdiByPort(port) {
+      if (!port) return null;
+      const normalised = port.replace(/\s/g, '');
+      return DDI_LIST.find(d =>
+        normalised.includes(d.number) ||
+        normalised.includes(d.ddi.replace('+','')) ||
+        d.ddi.includes(normalised)
+      );
+    }
+
+    function findDdiByDdiOrGroup(val) {
+      if (!val) return DDI_LIST[0];
+      const n = val.replace(/\s/g, '');
+      return DDI_LIST.find(d =>
+        n.includes(d.number) || n.includes(d.ddi.replace('+','')) || d.name.toLowerCase() === n.toLowerCase()
+      ) || DDI_LIST[0];
+    }
+
+    function flashElement(el) {
+      if (!el) return;
+      el.classList.remove('flash');
+      void el.offsetWidth;
+      el.classList.add('flash');
+    }
+
+    function showToast(msg) {
+      const container = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.textContent = msg;
+      container.appendChild(t);
+      setTimeout(() => t.remove(), 3000);
+    }
+
+    function showError(msg) {
+      document.getElementById('errorMessage').textContent = msg;
+      document.getElementById('errorBanner').classList.add('visible');
+    }
+
+    function hideError() {
+      document.getElementById('errorBanner').classList.remove('visible');
+    }
+
+    function setKpiValue(id, val, subId, subText, subClass) {
+      const el = document.getElementById(id);
+      const sub = document.getElementById(subId);
+      if (prevKpiValues[id] !== undefined && prevKpiValues[id] !== val) {
+        flashElement(el);
+      }
+      prevKpiValues[id] = val;
+      el.textContent = val;
+      sub.textContent = subText;
+      sub.className = 'kpi-sub' + (subClass ? ' ' + subClass : '');
+    }
+
+    function enableDemoBadge() {
+      document.getElementById('demoBadge').style.display = 'block';
+    }
+
+    // ============================================================
+    // REQUEST QUEUE
+    // ============================================================
+    class TollringQueue {
+      constructor() {
+        this.queue = [];
+        this.running = false;
+        this.gap = 500;
+      }
+      add(fn) {
+        return new Promise((resolve, reject) => {
+          this.queue.push({ fn, resolve, reject });
+          this.run();
+        });
+      }
+      async run() {
+        if (this.running) return;
+        this.running = true;
+        while (this.queue.length > 0) {
+          const { fn, resolve, reject } = this.queue.shift();
+          try {
+            const result = await fn();
+            resolve(result);
+          } catch (e) {
+            reject(e);
+          }
+          if (this.queue.length > 0) {
+            await new Promise(r => setTimeout(r, this.gap));
+          }
+        }
+        this.running = false;
+      }
+    }
+
+    const apiQueue = new TollringQueue();
+
+    // ============================================================
+    // API FUNCTIONS
+    // ============================================================
+    async function fetchTollring(endpoint, method, body) {
+      const authHeader = 'Basic ' + btoa(TOLLRING_USERNAME + ':' + TOLLRING_TOKEN);
+      const opts = {
+        method: method || 'GET',
+        headers: {
+          'Authorization': authHeader,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      };
+      if (body) opts.body = JSON.stringify(body);
+
+      const res = await fetch(TOLLRING_BASE + endpoint, opts);
+      if (res.status === 401 || res.status === 403) {
+        throw new Error('AUTH_FAILED');
+      }
+      if (!res.ok) {
+        throw new Error(`API error: ${res.status}`);
+      }
+      return res.json();
+    }
+
+    function queuedFetch(endpoint, method, body) {
+      return apiQueue.add(() => fetchTollring(endpoint, method, body));
+    }
+
+    async function getLiveCalls() {
+      if (isDemoMode) return demoGetLiveCalls();
+      try {
+        const data = await queuedFetch('/GetLiveCalls');
+        lastKnownData.live = data;
+        hideError();
+        return data;
+      } catch (e) {
+        debug('GetLiveCalls failed: ' + e.message);
+        if (e.message === 'AUTH_FAILED') activateDemoMode();
+        return lastKnownData.live;
+      }
+    }
+
+    async function getCallsByDate(offsetDays) {
+      if (isDemoMode) return offsetDays === -1 ? demoYesterdayCalls : demoTodayCalls;
+      const range = getDateRange(offsetDays || 0);
+      const body = { ...range, Directions: 'INC,IU,OUT' };
+      try {
+        const data = await queuedFetch('/GetCallsByDate', 'POST', body);
+        if (offsetDays === -1) {
+          lastKnownData.yesterday = data;
+        } else {
+          lastKnownData.today = data;
+        }
+        hideError();
+        return Array.isArray(data) ? data : (data.Calls || data.calls || []);
+      } catch (e) {
+        debug('GetCallsByDate failed: ' + e.message);
+        if (e.message === 'AUTH_FAILED') activateDemoMode();
+        return offsetDays === -1 ? lastKnownData.yesterday : lastKnownData.today;
+      }
+    }
+
+    function activateDemoMode() {
+      if (isDemoMode) return;
+      isDemoMode = true;
+      enableDemoBadge();
+      showToast('Switched to demo mode - configure API credentials to go live');
+      initDemoData();
+    }
+
+    function retryConnection() {
+      hideError();
+      isDemoMode = DEMO_MODE;
+      if (!DEMO_MODE) {
+        pollLiveCalls();
+        pollTodayData();
+      }
+    }
+
+    // ============================================================
+    // DEMO DATA GENERATOR
+    // ============================================================
+    let demoTodayCalls = [];
+    let demoYesterdayCalls = [];
+    let demoLiveCalls = [];
+    function bellCurveHourly(baseMax) {
+      const hours = [];
+      for (let h = 0; h < 24; h++) {
+        let factor = 0.05;
+        if (h >= 9 && h <= 12) factor = 0.6 + Math.random() * 0.4;
+        else if (h >= 14 && h <= 17) factor = 0.5 + Math.random() * 0.4;
+        else if (h >= 8 && h <= 18) factor = 0.2 + Math.random() * 0.3;
+        hours.push(Math.round(baseMax * factor * (0.7 + Math.random() * 0.6)));
+      }
+      return hours;
+    }
+
+    function pickWeightedHour(weights, total) {
+      let roll = Math.random() * total;
+      for (let h = 0; h < weights.length; h++) {
+        roll -= weights[h];
+        if (roll <= 0) return h;
+      }
+      return 12;
+    }
+
+    function initDemoData() {
+      enableDemoBadge();
+      demoTodayCalls = [];
+      demoYesterdayCalls = [];
+      const todayStr = getLondonDateString(0);
+      const yestStr = getLondonDateString(-1);
+
+      DDI_LIST.forEach((ddi, idx) => {
+        const todayCount = 15 + Math.floor(Math.random() * 40) + idx * 3;
+        const yestCount = 12 + Math.floor(Math.random() * 35) + idx * 2;
+        const todayWeights = bellCurveHourly(12);
+        const yestWeights = bellCurveHourly(10);
+        const todayWeightSum = todayWeights.reduce((a, b) => a + b, 0) || 1;
+        const yestWeightSum = yestWeights.reduce((a, b) => a + b, 0) || 1;
+
+        for (let i = 0; i < todayCount; i++) {
+          const hour = pickWeightedHour(todayWeights, todayWeightSum);
+          const dir = Math.random() < 0.15 ? 'IU' : (Math.random() < 0.1 ? 'OUT' : 'INC');
+          demoTodayCalls.push({
+            Direction: dir,
+            Port: ddi.number,
+            DDIOrGroup: ddi.ddi,
+            Caller_ID: '07' + String(Math.floor(Math.random() * 900000000 + 100000000)),
+            Call_date: `${todayStr} ${String(hour).padStart(2,'0')}:${String(Math.floor(Math.random()*60)).padStart(2,'0')}:00`,
+            Ring_time: Math.floor(Math.random() * 35) + 5,
+            Talk_time: dir === 'IU' ? 0 : Math.floor(Math.random() * 300) + 30,
+            Duration: Math.floor(Math.random() * 360) + 20
+          });
+        }
+        for (let i = 0; i < yestCount; i++) {
+          const hour = pickWeightedHour(yestWeights, yestWeightSum);
+          const dir = Math.random() < 0.12 ? 'IU' : (Math.random() < 0.1 ? 'OUT' : 'INC');
+          demoYesterdayCalls.push({
+            Direction: dir,
+            Port: ddi.number,
+            DDIOrGroup: ddi.ddi,
+            Caller_ID: '07' + String(Math.floor(Math.random() * 900000000 + 100000000)),
+            Call_date: `${yestStr} ${String(hour).padStart(2,'0')}:${String(Math.floor(Math.random()*60)).padStart(2,'0')}:00`,
+            Ring_time: Math.floor(Math.random() * 40) + 5,
+            Talk_time: dir === 'IU' ? 0 : Math.floor(Math.random() * 280) + 20,
+            Duration: Math.floor(Math.random() * 340) + 15
+          });
+        }
+      });
+
+      demoLiveCalls = generateDemoLiveCalls();
+      if (demoInterval) clearInterval(demoInterval);
+      demoInterval = setInterval(simulateDemoTick, 20000 + Math.random() * 10000);
+    }
+
+    function generateDemoLiveCalls() {
+      const count = 2 + Math.floor(Math.random() * 3);
+      const calls = [];
+      const used = new Set();
+      for (let i = 0; i < count; i++) {
+        let ddi;
+        do { ddi = DDI_LIST[Math.floor(Math.random() * DDI_LIST.length)]; } while (used.has(ddi.ddi) && used.size < DDI_LIST.length);
+        used.add(ddi.ddi);
+        const statuses = ['Ringing', 'Connected', 'Connected'];
+        calls.push({
+          Direction: Math.random() < 0.2 ? 'OUT' : 'INC',
+          Extension: '101',
+          DDIOrGroup: ddi.ddi,
+          Caller_ID: '07' + String(Math.floor(Math.random() * 900000000 + 100000000)),
+          Call_Status: statuses[Math.floor(Math.random() * statuses.length)],
+          TimeInCurrentStatus: Math.floor(Math.random() * 120) + 5,
+          _ddi: ddi,
+          _startTime: Date.now()
+        });
+      }
+      return calls;
+    }
+
+    function demoGetLiveCalls() {
+      return demoLiveCalls.map(c => ({
+        ...c,
+        TimeInCurrentStatus: c.TimeInCurrentStatus + Math.floor((Date.now() - c._startTime) / 1000)
+      }));
+    }
+
+    function simulateDemoTick() {
+      if (Math.random() < 0.4) {
+        const ddi = DDI_LIST[Math.floor(Math.random() * DDI_LIST.length)];
+        const dir = Math.random() < 0.15 ? 'IU' : (Math.random() < 0.1 ? 'OUT' : 'INC');
+        const p = getLondonParts(new Date());
+        const newCall = {
+          Direction: dir,
+          Port: ddi.number,
+          DDIOrGroup: ddi.ddi,
+          Caller_ID: '07' + String(Math.floor(Math.random() * 900000000 + 100000000)),
+          Call_date: `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}:${p.second}`,
+          Ring_time: Math.floor(Math.random() * 25) + 5,
+          Talk_time: dir === 'IU' ? 0 : Math.floor(Math.random() * 200) + 20,
+          Duration: Math.floor(Math.random() * 250) + 15
+        };
+        demoTodayCalls.push(newCall);
+        addTickerEvent(newCall, dir === 'IU' ? 'Missed call' : 'Incoming call');
+        if (dir === 'INC') showToast(`Incoming call on ${ddi.name}`);
+        processAllData();
+      }
+
+      if (Math.random() < 0.3) {
+        demoLiveCalls = generateDemoLiveCalls();
+      } else {
+        demoLiveCalls.forEach(c => {
+          if (Math.random() < 0.2) {
+            c.Call_Status = c.Call_Status === 'Ringing' ? 'Connected' : 'Ringing';
+            c._startTime = Date.now();
+            c.TimeInCurrentStatus = 0;
+          }
+        });
+      }
+      pollLiveCalls();
+    }
+
+    // ============================================================
+    // DATA PROCESSING
+    // ============================================================
+    function processCallsData(calls) {
+      const total = calls.length;
+      const answered = calls.filter(c => c.Direction === 'INC').length;
+      const missed = calls.filter(c => c.Direction === 'IU').length;
+      const ringTimes = calls.filter(c => c.Ring_time > 0).map(c => c.Ring_time);
+      const avgRing = ringTimes.length ? ringTimes.reduce((a,b) => a+b, 0) / ringTimes.length : 0;
+      const answerRate = total > 0 ? Math.round((answered / total) * 100) : 0;
+      const missedRate = total > 0 ? Math.round((missed / total) * 100) : 0;
+
+      const ddiCounts = {};
+      DDI_LIST.forEach(d => { ddiCounts[d.ddi] = 0; });
+      calls.forEach(c => {
+        const ddi = findDdiByPort(c.Port || c.DDIOrGroup);
+        if (ddi) ddiCounts[ddi.ddi]++;
+      });
+
+      const hourlyToday = bucketByHour(calls);
+      return { total, answered, missed, avgRing, answerRate, missedRate, ddiCounts, hourlyToday };
+    }
+
+    function processYesterdayCounts(calls) {
+      const ddiCounts = {};
+      DDI_LIST.forEach(d => { ddiCounts[d.ddi] = 0; });
+      calls.forEach(c => {
+        const ddi = findDdiByPort(c.Port || c.DDIOrGroup);
+        if (ddi) ddiCounts[ddi.ddi]++;
+      });
+      const ringTimes = calls.filter(c => c.Ring_time > 0).map(c => c.Ring_time);
+      const avgRing = ringTimes.length ? ringTimes.reduce((a, b) => a + b, 0) / ringTimes.length : 0;
+      return {
+        total: calls.length,
+        answered: calls.filter(c => c.Direction === 'INC').length,
+        missed: calls.filter(c => c.Direction === 'IU').length,
+        avgRing,
+        ddiCounts,
+        hourly: bucketByHour(calls)
+      };
+    }
+
+    function bucketByHour(calls) {
+      const buckets = new Array(24).fill(0);
+      calls.forEach(c => {
+        if (!c.Call_date) return;
+        const match = c.Call_date.match(/(\d{2}):(\d{2}):/);
+        if (match) buckets[parseInt(match[1], 10)]++;
+      });
+      return buckets;
+    }
+
+    function updateDdiStatuses(live) {
+      DDI_LIST.forEach(d => { ddiStatuses[d.ddi] = 'idle'; });
+      live.forEach(call => {
+        const ddi = findDdiByDdiOrGroup(call.DDIOrGroup);
+        if (!ddi) return;
+        const status = (call.Call_Status || '').toLowerCase();
+        if (status.includes('ring')) ddiStatuses[ddi.ddi] = 'ringing';
+        else if (status.includes('connect') || status.includes('call')) ddiStatuses[ddi.ddi] = 'incall';
+        else ddiStatuses[ddi.ddi] = 'incall';
+      });
+    }
+
+    function getRecentCalls(calls, limit) {
+      return [...calls]
+        .sort((a, b) => (b.Call_date || '').localeCompare(a.Call_date || ''))
+        .slice(0, limit || 10);
+    }
+
+    function addTickerEvent(call, label) {
+      const ddi = findDdiByPort(call.Port || call.DDIOrGroup) || findDdiByDdiOrGroup(call.DDIOrGroup);
+      const timeMatch = (call.Call_date || '').match(/(\d{2}:\d{2})/);
+      const time = timeMatch ? timeMatch[1] : getLondonParts(new Date()).hour + ':' + getLondonParts(new Date()).minute;
+      tickerEvents.unshift({ time, ddi: ddi ? ddi.name : 'Unknown', label });
+      if (tickerEvents.length > 50) tickerEvents.length = 50;
+    }
+
+    // ============================================================
+    // UI RENDER FUNCTIONS
+    // ============================================================
+    function renderKpis(today, yesterday, liveCount) {
+      const t = processCallsData(today);
+      const y = processYesterdayCounts(yesterday);
+
+      const totalPct = pctChange(t.total, y.total);
+      setKpiValue('kpiTotalVal', t.total, 'kpiTotalSub', formatPct(totalPct), totalPct >= 0 ? 'up' : 'down');
+
+      setKpiValue('kpiLiveVal', liveCount, 'kpiLiveSub',
+        liveCount > 0 ? 'Currently active' : 'All lines idle', '');
+
+      const liveTile = document.getElementById('kpiLive');
+      liveTile.classList.toggle('pulse-live', liveCount > 0);
+
+      const ansPct = pctChange(t.answered, y.answered);
+      setKpiValue('kpiAnsweredVal', t.answered, 'kpiAnsweredSub',
+        `${t.answerRate}% answer rate`, ansPct >= 0 ? 'up' : 'down');
+
+      setKpiValue('kpiMissedVal', t.missed, 'kpiMissedSub',
+        `${t.missedRate}% missed rate`, '');
+
+      const avgStr = formatTime(t.avgRing);
+      const goalHtml = t.avgRing <= 20 ? ' <span class="goal-badge">Under 20s goal</span>' : '';
+      const avgEl = document.getElementById('kpiAvgRtVal');
+      if (prevKpiValues.kpiAvgRtVal !== avgStr) flashElement(avgEl);
+      prevKpiValues.kpiAvgRtVal = avgStr;
+      avgEl.textContent = avgStr;
+      const avgSub = document.getElementById('kpiAvgRtSub');
+      avgSub.innerHTML = formatPct(pctChange(Math.round(t.avgRing), Math.round(y.avgRing))) + goalHtml;
+
+      renderDonutCompare(t.total, y.total);
+      renderDonutMissed(t.missed, t.answered);
+      renderTopPerformer(t.ddiCounts, y.ddiCounts);
+    }
+
+    function renderDdiTable(todayCounts, yesterdayCounts) {
+      const tbody = document.getElementById('ddiTableBody');
+      tbody.innerHTML = DDI_LIST.map((ddi, idx) => {
+        const count = todayCounts[ddi.ddi] || 0;
+        const yCount = yesterdayCounts[ddi.ddi] || 0;
+        const pct = pctChange(count, yCount);
+        const pctClass = pct > 0 ? 'up' : pct < 0 ? 'down' : 'neutral';
+        const pctText = pct > 0 ? `+${pct}%` : pct < 0 ? `${pct}%` : '0%';
+        const status = ddiStatuses[ddi.ddi] || 'idle';
+        const colour = AVATAR_COLOURS[idx % AVATAR_COLOURS.length];
+        return `<tr>
+          <td><div class="ddi-icon" style="background:${colour}22;color:${colour}">${ddi.name.charAt(0)}</div></td>
+          <td><div class="ddi-name">${ddi.name}</div></td>
+          <td><div class="ddi-number">${ddi.number}</div></td>
+          <td><div class="ddi-count" data-ddi="${ddi.ddi}">${count}</div></td>
+          <td><span class="pct-change ${pctClass}">${pctText}</span></td>
+          <td><span class="status-dot ${status}" title="${status}"></span></td>
+        </tr>`;
+      }).join('');
+    }
+
+    function renderLiveCalls(live) {
+      const list = document.getElementById('liveCallsList');
+      if (!live || live.length === 0) {
+        list.innerHTML = `<li class="empty-state">
+          <div class="empty-state-icon">&#128222;</div>
+          <div>No active calls</div>
+        </li>`;
+        return;
+      }
+      list.innerHTML = live.map((call, idx) => {
+        const ddi = call._ddi || findDdiByDdiOrGroup(call.DDIOrGroup);
+        const colour = AVATAR_COLOURS[DDI_LIST.indexOf(ddi) % AVATAR_COLOURS.length];
+        const status = (call.Call_Status || '').toLowerCase();
+        let badgeClass = 'connecting', badgeText = 'Connecting';
+        if (status.includes('ring')) { badgeClass = 'ringing'; badgeText = 'Ringing'; }
+        else if (status.includes('connect')) { badgeClass = 'incall'; badgeText = 'In Call'; }
+        const elapsed = call.TimeInCurrentStatus || 0;
+        return `<li class="call-item" data-idx="${idx}" data-elapsed="${elapsed}" data-start="${Date.now()}">
+          <div class="call-avatar" style="background:${colour}">${ddi.name.charAt(0)}</div>
+          <div class="call-info">
+            <div class="call-info-name">${ddi.name}</div>
+            <div class="call-info-num">${call.Caller_ID || call.DDIOrGroup}</div>
+          </div>
+          <div class="call-timer" id="liveTimer${idx}">${formatTime(elapsed)}</div>
+          <span class="status-badge ${badgeClass}">${badgeText}</span>
+          <div class="call-loading-bar"></div>
+        </li>`;
+      }).join('');
+    }
+
+    function renderRecentCalls(calls) {
+      const recent = getRecentCalls(calls, 10);
+      const tbody = document.getElementById('recentCallsBody');
+      if (recent.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="empty-state" style="padding:20px;">No calls yet today</td></tr>';
+        return;
+      }
+      tbody.innerHTML = recent.map(c => {
+        const ddi = findDdiByPort(c.Port || c.DDIOrGroup);
+        const timeMatch = (c.Call_date || '').match(/(\d{2}:\d{2})/);
+        const time = timeMatch ? timeMatch[1] : '--:--';
+        const dur = formatDuration(c.Talk_time || c.Duration || 0);
+        let dirIcon, dirClass;
+        if (c.Direction === 'IU') { dirIcon = '\u2715'; dirClass = 'dir-missed'; }
+        else if (c.Direction === 'OUT') { dirIcon = '\u2191'; dirClass = 'dir-out'; }
+        else { dirIcon = '\u2193'; dirClass = 'dir-inc'; }
+        return `<tr>
+          <td>${time}</td>
+          <td>${ddi ? ddi.name : 'Unknown'}</td>
+          <td>${dur}</td>
+          <td><span class="dir-icon ${dirClass}">${dirIcon}</span></td>
+        </tr>`;
+      }).join('');
+    }
+
+    function renderTicker() {
+      const content = document.getElementById('tickerContent');
+      if (tickerEvents.length === 0) {
+        const items = DDI_LIST.slice(0, 5).map(d =>
+          `<span class="ticker-item"><span class="t-time">--:--</span> <span class="t-ddi">${d.name}</span> Waiting for activity...</span>`
+        ).join('');
+        content.innerHTML = items + items;
+        return;
+      }
+      const items = tickerEvents.map(e =>
+        `<span class="ticker-item"><span class="t-time">${e.time}</span> <span class="t-ddi">${e.ddi}</span> ${e.label}</span>`
+      ).join('');
+      content.innerHTML = items + items;
+    }
+
+    function renderTopPerformer(todayCounts, yesterdayCounts) {
+      let best = null, bestCount = 0;
+      DDI_LIST.forEach(d => {
+        const c = todayCounts[d.ddi] || 0;
+        if (c > bestCount) { bestCount = c; best = d; }
+      });
+      if (!best) {
+        document.getElementById('topPerformerName').textContent = '--';
+        document.getElementById('topPerformerCount').textContent = '0';
+        document.getElementById('topPerformerSub').textContent = 'No data yet';
+        return;
+      }
+      const yCount = yesterdayCounts[best.ddi] || 0;
+      const pct = pctChange(bestCount, yCount);
+      document.getElementById('topPerformerName').textContent = best.name;
+      document.getElementById('topPerformerCount').textContent = bestCount;
+      document.getElementById('topPerformerSub').textContent = formatPct(pct);
+      document.getElementById('topPerformerSub').className = 'top-performer-sub ' + (pct >= 0 ? 'up' : 'down');
+    }
+
+    // ============================================================
+    // CHART
+    // ============================================================
+    function renderChart(todayHourly, yesterdayHourly) {
+      const svg = document.getElementById('chartSvg');
+      const W = 600, H = 200, padL = 40, padR = 16, padT = 16, padB = 28;
+      const chartW = W - padL - padR;
+      const chartH = H - padT - padB;
+      const maxVal = Math.max(1, ...todayHourly, ...yesterdayHourly);
+
+      function toPoints(data) {
+        return data.map((v, i) => {
+          const x = padL + (i / 23) * chartW;
+          const y = padT + chartH - (v / maxVal) * chartH;
+          return { x, y, v, hour: i };
+        });
+      }
+
+      const todayPts = toPoints(todayHourly);
+      const yestPts = toPoints(yesterdayHourly);
+
+      function linePath(pts) {
+        return pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+      }
+
+      function areaPath(pts) {
+        const bottom = padT + chartH;
+        return linePath(pts) + ` L${pts[pts.length-1].x.toFixed(1)},${bottom} L${pts[0].x.toFixed(1)},${bottom} Z`;
+      }
+
+      const hourLabels = [0, 4, 8, 12, 16, 20, 24];
+      let html = `<defs>
+        <linearGradient id="todayGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0d77fe" stop-opacity="0.18"/>
+          <stop offset="100%" stop-color="#0d77fe" stop-opacity="0.02"/>
+        </linearGradient>
+      </defs>`;
+
+      for (let i = 0; i <= 4; i++) {
+        const y = padT + (i / 4) * chartH;
+        html += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#e2e8f0" stroke-width="0.5"/>`;
+      }
+
+      hourLabels.forEach(h => {
+        const x = padL + (h / 24) * chartW;
+        html += `<text x="${x}" y="${H - 6}" fill="#64748b" font-size="9" text-anchor="middle" font-family="Inter,sans-serif">${String(h).padStart(2,'0')}:00</text>`;
+      });
+
+      html += `<path d="${areaPath(todayPts)}" fill="url(#todayGrad)"/>`;
+      html += `<path d="${linePath(yestPts)}" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+      html += `<path d="${linePath(todayPts)}" fill="none" stroke="#0d77fe" stroke-width="2.5"/>`;
+
+      todayPts.forEach(p => {
+        if (p.v > 0) {
+          html += `<circle cx="${p.x}" cy="${p.y}" r="3" fill="#0d77fe" stroke="#fff" stroke-width="1.5"/>`;
+        }
+        html += `<circle cx="${p.x}" cy="${p.y}" r="8" fill="transparent" class="chart-hit" data-hour="${p.hour}" data-today="${p.v}" data-yest="${yestPts[p.hour].v}" style="cursor:pointer"/>`;
+      });
+
+      svg.innerHTML = html;
+
+      svg.querySelectorAll('.chart-hit').forEach(circle => {
+        circle.addEventListener('mouseenter', e => {
+          const hour = parseInt(circle.dataset.hour);
+          const tooltip = document.getElementById('chartTooltip');
+          tooltip.innerHTML = `<strong>${String(hour).padStart(2,'0')}:00</strong><br>Today: ${circle.dataset.today} calls<br>Yesterday: ${circle.dataset.yest} calls`;
+          tooltip.classList.add('visible');
+          const rect = document.getElementById('chartContainer').getBoundingClientRect();
+          tooltip.style.left = (e.clientX - rect.left - 40) + 'px';
+          tooltip.style.top = (e.clientY - rect.top - 50) + 'px';
+        });
+        circle.addEventListener('mouseleave', () => {
+          document.getElementById('chartTooltip').classList.remove('visible');
+        });
+      });
+    }
+
+    // ============================================================
+    // DONUT CHARTS
+    // ============================================================
+    function renderDonut(svgId, value, total, centerText, colour) {
+      const svg = document.getElementById(svgId);
+      const r = 45, cx = 60, cy = 60, sw = 10;
+      const pct = total > 0 ? Math.min(value / total, 1) : 0;
+      const circ = 2 * Math.PI * r;
+      const offset = circ * (1 - pct);
+      svg.innerHTML = `
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#e2e8f0" stroke-width="${sw}"/>
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${colour}" stroke-width="${sw}"
+          stroke-dasharray="${circ}" stroke-dashoffset="${offset}"
+          transform="rotate(-90 ${cx} ${cy})" stroke-linecap="round"/>
+        <text x="${cx}" y="${cy + 2}" text-anchor="middle" class="donut-center" font-size="18" font-weight="800" fill="#0f172a" font-family="Inter,sans-serif">${centerText}</text>`;
+    }
+
+    function renderDonutCompare(todayTotal, yestTotal) {
+      const pct = pctChange(todayTotal, yestTotal);
+      const sign = pct >= 0 ? '+' : '';
+      renderDonut('donutCompare', todayTotal, todayTotal + yestTotal, `${sign}${pct}%`, pct >= 0 ? '#059669' : '#dc2626');
+      document.getElementById('donutCompareLabel').textContent = `${todayTotal} today vs ${yestTotal} yesterday`;
+    }
+
+    function renderDonutMissed(missed, answered) {
+      const total = missed + answered;
+      const rate = total > 0 ? Math.round((missed / total) * 100) : 0;
+      renderDonut('donutMissed', missed, total || 1, String(missed), '#dc2626');
+      document.getElementById('donutMissedLabel').textContent = `${rate}% missed rate`;
+    }
+
+    // ============================================================
+    // CLOCK & WEATHER
+    // ============================================================
+    function updateClock() {
+      const now = new Date();
+      const p = getLondonParts(now);
+      document.getElementById('clockTime').textContent = `${p.hour}:${p.minute}`;
+      const dayFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', weekday: 'short', day: 'numeric', month: 'short' });
+      document.getElementById('clockDate').textContent = dayFmt.format(now);
+    }
+
+    async function fetchWeather() {
+      const weatherEl = document.getElementById('weatherDisplay');
+      let lat = 52.4862, lon = -1.8904;
+      try {
+        if (navigator.geolocation) {
+          const pos = await new Promise((res, rej) => {
+            navigator.geolocation.getCurrentPosition(res, rej, { timeout: 5000 });
+          });
+          lat = pos.coords.latitude;
+          lon = pos.coords.longitude;
+        }
+      } catch (_) { /* default to Birmingham */ }
+
+      try {
+        const url = `https://wttr.in/${lat},${lon}?format=j1`;
+        const res = await fetch(url);
+        const data = await res.json();
+        const cur = data.current_condition[0];
+        const temp = cur.temp_C;
+        const code = parseInt(cur.weatherCode);
+        const icons = { sunny: '\u2600\uFE0F', cloudy: '\u2601\uFE0F', rain: '\u2614', snow: '\u2744\uFE0F', fog: '\u1F32B\uFE0F' };
+        let icon = icons.cloudy;
+        if ([113].includes(code)) icon = icons.sunny;
+        else if ([176,293,296,299,302,305,308,311,314,353,356].includes(code)) icon = icons.rain;
+        else if ([227,230,323,326,329,332,335,338,371].includes(code)) icon = icons.snow;
+        document.getElementById('weatherIcon').textContent = icon;
+        document.getElementById('weatherTemp').textContent = `${temp}\u00B0C`;
+      } catch (_) {
+        document.getElementById('weatherIcon').textContent = '\u2601\uFE0F';
+        document.getElementById('weatherTemp').textContent = '--\u00B0C';
+      }
+    }
+
+    // ============================================================
+    // LIVE TIMERS
+    // ============================================================
+    function startLiveTimers() {
+      if (liveTimerInterval) clearInterval(liveTimerInterval);
+      liveTimerInterval = setInterval(() => {
+        document.querySelectorAll('.call-item[data-elapsed]').forEach(item => {
+          const idx = item.dataset.idx;
+          const startElapsed = parseInt(item.dataset.elapsed, 10);
+          const startTime = parseInt(item.dataset.start, 10);
+          const elapsed = startElapsed + Math.floor((Date.now() - startTime) / 1000);
+          const timer = document.getElementById('liveTimer' + idx);
+          if (timer) timer.textContent = formatTime(elapsed);
+        });
+      }, 1000);
+    }
+
+    // ============================================================
+    // PROCESS ALL & POLLING
+    // ============================================================
+    function processAllData() {
+      const today = isDemoMode ? demoTodayCalls : todayCalls;
+      const yesterday = isDemoMode ? demoYesterdayCalls : yesterdayCalls;
+      const t = processCallsData(today);
+      const y = processYesterdayCounts(yesterday);
+      renderKpis(today, yesterday, liveCalls.length);
+      renderDdiTable(t.ddiCounts, y.ddiCounts);
+      renderChart(t.hourlyToday, y.hourly);
+      renderRecentCalls(today);
+      renderTicker();
+    }
+
+    async function pollLiveCalls() {
+      const data = await getLiveCalls();
+      liveCalls = Array.isArray(data) ? data : (data.Calls || data.calls || []);
+      updateDdiStatuses(liveCalls);
+      renderLiveCalls(liveCalls);
+      startLiveTimers();
+      const today = isDemoMode ? demoTodayCalls : todayCalls;
+      const yesterday = isDemoMode ? demoYesterdayCalls : yesterdayCalls;
+      renderKpis(today, yesterday, liveCalls.length);
+      renderDdiTable(
+        processCallsData(today).ddiCounts,
+        processYesterdayCounts(yesterday).ddiCounts
+      );
+    }
+
+    async function pollTodayData() {
+      todayCalls = await getCallsByDate(0);
+      if (!Array.isArray(todayCalls)) todayCalls = [];
+      processAllData();
+    }
+
+    async function pollYesterdayData() {
+      yesterdayCalls = await getCallsByDate(-1);
+      if (!Array.isArray(yesterdayCalls)) yesterdayCalls = [];
+      processAllData();
+    }
+
+    // ============================================================
+    // CHART SELECT
+    // ============================================================
+    document.getElementById('chartSelect').addEventListener('change', function() {
+      if (this.value !== 'today') {
+        showToast('Coming soon - only Today view is available');
+        this.value = 'today';
+      }
+    });
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    async function init() {
+      updateClock();
+      setInterval(updateClock, 1000);
+      fetchWeather();
+
+      if (DEMO_MODE) {
+        isDemoMode = true;
+        initDemoData();
+      } else {
+        try {
+          await pollTodayData();
+        } catch (e) {
+          activateDemoMode();
+        }
+      }
+
+      await pollLiveCalls();
+      await pollYesterdayData();
+
+      if (isDemoMode && tickerEvents.length === 0) {
+        demoTodayCalls.slice(-8).reverse().forEach(c => {
+          const label = c.Direction === 'IU' ? 'Missed call' : c.Direction === 'OUT' ? 'Outgoing call' : 'Incoming call';
+          addTickerEvent(c, label);
+        });
+        renderTicker();
+      }
+
+      setInterval(pollLiveCalls, 8000);
+      setInterval(pollTodayData, 30000);
+      setInterval(pollYesterdayData, 300000);
+    }
+
+    init();
+  </script>
+</body>
+</html>
