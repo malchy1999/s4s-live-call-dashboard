@@ -32,6 +32,8 @@
       --purple-light: rgba(124, 58, 237, 0.08);
       --pink: #db2777;
       --pink-light: rgba(219, 39, 119, 0.08);
+      --cyan: #0891b2;
+      --cyan-light: rgba(8, 145, 178, 0.08);
       --font: 'Inter', sans-serif;
       --radius: 14px;
       --radius-sm: 8px;
@@ -213,13 +215,13 @@
       padding-left: 24px;
     }
     .header-right { display: flex; align-items: center; gap: 16px; }
-    .header-meta {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding-left: 16px;
-      border-left: 1px solid var(--border-card);
+    .last-updated {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+      white-space: nowrap;
     }
+    .last-updated.fresh { color: var(--success); }
     .live-badge {
       display: flex;
       align-items: center;
@@ -254,42 +256,10 @@
       font-weight: 700;
       letter-spacing: 1px;
     }
-    .weather-display {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--text-muted);
-      font-size: 14px;
-      background: var(--bg-subtle);
-      padding: 6px 12px;
-      border-radius: var(--radius-sm);
-    }
-    .weather-display .temp { color: var(--text-primary); font-weight: 600; }
-    .clock-display {
-      text-align: right;
-      background: var(--bg-subtle);
-      padding: 6px 14px;
-      border-radius: var(--radius-sm);
-    }
-    .clock-time {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--text-primary);
-      font-variant-numeric: tabular-nums;
-      line-height: 1.2;
-    }
-    .clock-date {
-      font-size: 10px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-weight: 500;
-    }
-
     /* KPI Row */
     .kpi-row {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(6, 1fr);
       gap: 16px;
       margin-bottom: 24px;
     }
@@ -320,11 +290,13 @@
     .kpi-tile.purple::before { background: var(--purple); }
     .kpi-tile.orange::before { background: var(--warning); }
     .kpi-tile.pink::before { background: var(--pink); }
+    .kpi-tile.cyan::before { background: var(--cyan); }
     .kpi-tile.blue { background: linear-gradient(135deg, #fff 70%, var(--accent-primary-light)); }
     .kpi-tile.green { background: linear-gradient(135deg, #fff 70%, var(--success-light)); }
     .kpi-tile.purple { background: linear-gradient(135deg, #fff 70%, var(--purple-light)); }
     .kpi-tile.orange { background: linear-gradient(135deg, #fff 70%, var(--warning-light)); }
     .kpi-tile.pink { background: linear-gradient(135deg, #fff 70%, var(--pink-light)); }
+    .kpi-tile.cyan { background: linear-gradient(135deg, #fff 70%, var(--cyan-light)); }
     .kpi-tile.pulse-live {
       animation: kpiPulse 2s ease-in-out infinite;
       border-color: rgba(5, 150, 105, 0.3);
@@ -353,6 +325,7 @@
     .kpi-tile.purple .kpi-icon { background: var(--purple-light); }
     .kpi-tile.orange .kpi-icon { background: var(--warning-light); }
     .kpi-tile.pink .kpi-icon { background: var(--pink-light); }
+    .kpi-tile.cyan .kpi-icon { background: var(--cyan-light); }
     .kpi-label {
       font-size: 11px;
       font-weight: 600;
@@ -424,6 +397,15 @@
       color: var(--text-primary);
       text-transform: uppercase;
       letter-spacing: 0.5px;
+    }
+    .card-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--danger);
+      background: var(--danger-light);
+      padding: 3px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(220, 38, 38, 0.15);
     }
 
     /* DDI Table */
@@ -530,23 +512,45 @@
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.15s;
-      white-space: nowrap;
+      white-space: normal;
+      line-height: 1.45;
+      min-width: 140px;
       z-index: 10;
       box-shadow: var(--shadow-lg);
     }
     .chart-tooltip.visible { opacity: 1; }
     .chart-legend {
       display: flex;
-      gap: 20px;
+      flex-wrap: wrap;
+      gap: 6px 8px;
       margin-top: 10px;
-      font-size: 11px;
-      color: var(--text-muted);
-      font-weight: 500;
     }
-    .legend-item { display: flex; align-items: center; gap: 6px; }
-    .legend-line { width: 20px; height: 3px; border-radius: 2px; }
-    .legend-line.today { background: var(--accent-primary); }
-    .legend-line.yesterday { background: #94a3b8; }
+    .legend-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border: 1px solid var(--border-card);
+      border-radius: 16px;
+      background: var(--bg-subtle);
+      font-size: 10px;
+      font-weight: 500;
+      font-family: var(--font);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+    }
+    .legend-toggle:hover:not(.locked) { border-color: #cbd5e1; background: #fff; }
+    .legend-toggle.active {
+      background: #fff;
+      border-color: var(--accent-primary);
+      color: var(--text-primary);
+      box-shadow: var(--shadow-sm);
+    }
+    .legend-toggle.locked { cursor: default; }
+    .legend-item { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+    .legend-line { width: 16px; height: 2px; border-radius: 2px; flex-shrink: 0; }
+    .legend-line.total { background: var(--accent-primary); }
 
     /* Right column widgets */
     .right-col { display: flex; flex-direction: column; gap: 16px; }
@@ -605,7 +609,7 @@
     /* Bottom grid */
     .bottom-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 16px;
       margin-bottom: 16px;
     }
@@ -815,7 +819,6 @@
       .bottom-grid { grid-template-columns: 1fr; }
       .header { flex-direction: column; align-items: flex-start; }
       .header-right { width: 100%; justify-content: space-between; flex-wrap: wrap; }
-      .header-meta { border-left: none; padding-left: 0; }
       .dashboard { padding: 16px 16px 80px; }
     }
   </style>
@@ -840,21 +843,12 @@
         <div class="header-title">Live Call Dashboard</div>
       </div>
       <div class="header-right">
+        <div class="last-updated" id="lastUpdated">Last updated: waiting…</div>
         <div class="live-badge">
           <div class="live-dot"></div>
           LIVE
         </div>
         <div class="demo-badge" id="demoBadge" style="display:none;">DEMO MODE</div>
-        <div class="header-meta">
-          <div class="weather-display" id="weatherDisplay">
-            <span class="weather-icon" id="weatherIcon">--</span>
-            <span class="temp" id="weatherTemp">--</span>
-          </div>
-          <div class="clock-display">
-            <div class="clock-time" id="clockTime">--:--</div>
-            <div class="clock-date" id="clockDate">--</div>
-          </div>
-        </div>
       </div>
     </header>
 
@@ -875,11 +869,17 @@
 
     <!-- KPI Row -->
     <div class="kpi-row" id="kpiRow">
-      <div class="kpi-tile blue" id="kpiTotal">
+      <div class="kpi-tile blue" id="kpiInbound">
         <div class="kpi-top"><div class="kpi-icon">&#128222;</div></div>
-        <div class="kpi-label">Total Calls Today</div>
-        <div class="kpi-value" id="kpiTotalVal">--</div>
-        <div class="kpi-sub" id="kpiTotalSub">Loading...</div>
+        <div class="kpi-label">Inbound Today</div>
+        <div class="kpi-value" id="kpiInboundVal">--</div>
+        <div class="kpi-sub" id="kpiInboundSub">Loading...</div>
+      </div>
+      <div class="kpi-tile cyan" id="kpiOutbound">
+        <div class="kpi-top"><div class="kpi-icon">&#128228;</div></div>
+        <div class="kpi-label">Outbound Today</div>
+        <div class="kpi-value" id="kpiOutboundVal">--</div>
+        <div class="kpi-sub" id="kpiOutboundSub">Loading...</div>
       </div>
       <div class="kpi-tile green" id="kpiLive">
         <div class="kpi-top"><div class="kpi-icon">&#128225;</div></div>
@@ -933,7 +933,7 @@
       <!-- Chart -->
       <div class="card">
         <div class="card-header">
-          <div class="card-title">Calls Throughout Today</div>
+          <div class="card-title">Call Volume</div>
           <select class="chart-select" id="chartSelect">
             <option value="today">Today</option>
             <option value="week">This Week</option>
@@ -944,10 +944,7 @@
           <svg class="chart-svg" id="chartSvg" viewBox="0 0 600 220" preserveAspectRatio="xMidYMid meet"></svg>
           <div class="chart-tooltip" id="chartTooltip"></div>
         </div>
-        <div class="chart-legend">
-          <div class="legend-item"><div class="legend-line today"></div> Today</div>
-          <div class="legend-item"><div class="legend-line yesterday"></div> Yesterday</div>
-        </div>
+        <div class="chart-legend" id="chartLegend"></div>
       </div>
 
       <!-- Right Column -->
@@ -984,6 +981,23 @@
         </div>
         <ul class="call-list" id="liveCallsList"></ul>
         <button class="view-all-btn">View all live calls &#8250;</button>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Missed Calls Today</div>
+          <span class="card-badge" id="missedPanelCount">0</span>
+        </div>
+        <table class="recent-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Garage</th>
+              <th>Caller</th>
+              <th>Wait</th>
+            </tr>
+          </thead>
+          <tbody id="missedCallsBody"></tbody>
+        </table>
       </div>
       <div class="card">
         <div class="card-header">
@@ -1025,15 +1039,15 @@
 
     // Replace placeholder numbers with your real garage DDIs before going live
     const DDI_LIST = [
-      { name: 'A1',         number: '01767669575', ddi: '+441767669575' },
-      { name: 'Beds',       number: '01582320570', ddi: '+441582320570' },
-      { name: 'Manchester', number: '01616740142', ddi: '+441616740142' },
-      { name: 'Bristol',    number: '01174567065', ddi: '+441174567065' },
-      { name: 'Main',       number: '01932503647', ddi: '+441932503647' },
-      { name: 'Leeds',      number: '01133231775', ddi: '+441133231775' },
-      { name: 'South-east', number: '01580239610', ddi: '+441580239610' },
-      { name: 'Midlands',   number: '01922666376', ddi: '+441922666376' },
-      { name: 'London',     number: '02039056741', ddi: '+442039056741' },
+      { name: 'A1',         number: '01767669575', ddi: '+441767669575', groups: ['A.1leads.service4@4com.im'] },
+      { name: 'Beds',       number: '01582320570', ddi: '+441582320570', groups: [] },
+      { name: 'Manchester', number: '01616740142', ddi: '+441616740142', groups: [] },
+      { name: 'Bristol',    number: '01174567065', ddi: '+441174567065', groups: ['bristolincoming.service4@4com.im'] },
+      { name: 'Main',       number: '01932503647', ddi: '+441932503647', groups: ['gearboxenquiries.service4@4com.im', 'existingcustomer.service4@4com.im', 'garages24.service4@4com.im', 'nightservice.service4@4com.im'] },
+      { name: 'Leeds',      number: '01133231775', ddi: '+441133231775', groups: ['leedsincoming.service4@4com.im'] },
+      { name: 'South-east', number: '01580239610', ddi: '+441580239610', groups: ['weybridgeincoming1.service4@4com.im', 'cranbrookincoming.service4@4com.im'] },
+      { name: 'Midlands',   number: '01922666376', ddi: '+441922666376', groups: ['walsallincoming.service4@4com.im'] },
+      { name: 'London',     number: '02039056741', ddi: '+442039056741', groups: ['londonincoming.service4@4com.im'] },
     ];
 
     const AVATAR_COLOURS = ['#0d77fe','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#f97316','#6366f1'];
@@ -1051,8 +1065,58 @@
     let lastKnownData = { today: [], yesterday: [], live: [] };
     let demoInterval = null;
     let liveTimerInterval = null;
+    let isPolling = false;
+    let pollIntervalId = null;
+    let hasConnectedOnce = false;
+    const POLL_INTERVAL_MS = 30000;
+    let chartDataCache = null;
+    const chartSelectedDdis = new Set();
+
+    const uiSnapshots = {
+      liveKey: '',
+      todayKey: '',
+      yesterdayKey: '',
+      liveKpiKey: '',
+      kpiStatsKey: '',
+      ddiCountsKey: '',
+      ddiStatusKey: '',
+      chartKey: '',
+      recentKey: '',
+      tickerKey: '',
+      missedKey: ''
+    };
 
     DDI_LIST.forEach(d => { ddiStatuses[d.ddi] = 'idle'; });
+
+    function resetUiSnapshots() {
+      Object.keys(uiSnapshots).forEach(k => { uiSnapshots[k] = ''; });
+    }
+
+    function callRecordKey(c) {
+      return `${c.RecordId || c.CallId || ''}:${c.Call_date}:${c.Direction}:${c.Unanswer}:${c.Duration}:${c.Ring_time}:${c.Port || ''}`;
+    }
+
+    function fingerprintCalls(calls) {
+      if (!calls.length) return '0';
+      let hash = calls.length;
+      for (let i = 0; i < calls.length; i++) {
+        hash = (hash + (calls[i].RecordId || 0)) | 0;
+      }
+      return `${calls.length}:${hash}:${callRecordKey(calls[calls.length - 1])}`;
+    }
+
+    function fingerprintLive(calls) {
+      if (!calls.length) return '0';
+      return calls.map(c =>
+        `${c.Caller_ID}|${c.Extension}|${c.Call_Status}|${c.DDIOrGroup}|${c.Direction}`
+      ).join(';');
+    }
+
+    function findNewCalls(prev, next) {
+      if (!prev.length) return [];
+      const ids = new Set(prev.map(c => c.RecordId || c.CallId || callRecordKey(c)));
+      return next.filter(c => !ids.has(c.RecordId || c.CallId || callRecordKey(c)));
+    }
 
     // ============================================================
     // UTILITIES
@@ -1110,22 +1174,44 @@
       return 'No change vs yesterday';
     }
 
-    function findDdiByPort(port) {
-      if (!port) return null;
-      const normalised = port.replace(/\s/g, '');
+    function matchDdiByNumber(val) {
+      if (!val) return null;
+      const n = val.replace(/\s/g, '');
       return DDI_LIST.find(d =>
-        normalised.includes(d.number) ||
-        normalised.includes(d.ddi.replace('+','')) ||
-        d.ddi.includes(normalised)
-      );
+        n.includes(d.number) ||
+        n.includes(d.ddi.replace('+', '')) ||
+        d.ddi.includes(n)
+      ) || null;
+    }
+
+    function matchDdiByGroup(group) {
+      if (!group) return null;
+      const g = group.toLowerCase();
+      return DDI_LIST.find(d => (d.groups || []).some(x => g.includes(x.toLowerCase()))) || null;
+    }
+
+    function findDdiForCall(call) {
+      if (!call) return null;
+      return matchDdiByNumber(call.Port || call.DDIOrGroup) ||
+        matchDdiByGroup(call.Group_no || call.DDIOrGroup) ||
+        null;
     }
 
     function findDdiByDdiOrGroup(val) {
-      if (!val) return DDI_LIST[0];
-      const n = val.replace(/\s/g, '');
-      return DDI_LIST.find(d =>
-        n.includes(d.number) || n.includes(d.ddi.replace('+','')) || d.name.toLowerCase() === n.toLowerCase()
-      ) || DDI_LIST[0];
+      if (!val) return null;
+      return matchDdiByNumber(val) || matchDdiByGroup(val);
+    }
+
+    function parseStatusSeconds(val) {
+      if (val == null || val === '') return 0;
+      if (typeof val === 'number') return Math.max(0, Math.floor(val));
+      const str = String(val);
+      const parts = str.split(':').map(p => parseInt(p, 10));
+      if (parts.length === 3 && parts.every(p => !Number.isNaN(p))) {
+        return parts[0] * 3600 + parts[1] * 60 + parts[2];
+      }
+      const n = parseInt(str, 10);
+      return Number.isNaN(n) ? 0 : Math.max(0, n);
     }
 
     function flashElement(el) {
@@ -1193,7 +1279,7 @@
       constructor() {
         this.queue = [];
         this.running = false;
-        this.gap = 500;
+        this.gap = 2000;
       }
       add(fn) {
         return new Promise((resolve, reject) => {
@@ -1225,6 +1311,17 @@
     // ============================================================
     // API FUNCTIONS
     // ============================================================
+    function isRateLimitError(data, status) {
+      const code = data.Result?.ErrorCode;
+      if (code === '0x1009') return true;
+      if ((status === 401 || status === 403) && code !== '0x1006') return true;
+      return false;
+    }
+
+    function isAuthError(data) {
+      return data.Result?.ErrorCode === '0x1006';
+    }
+
     async function fetchTollring(endpoint, method, body, isRetry) {
       const path = endpoint.replace(/^\//, '');
       const opts = {
@@ -1244,18 +1341,18 @@
         data = {};
       }
 
-      if (data.Result && data.Result.ErrorCode === '0x1009') {
+      if (isRateLimitError(data, res.status)) {
         if (!isRetry) {
-          debug('Rate limited (0x1009), retrying in 8s: ' + path);
+          debug('Rate limited, retrying in 8s: ' + path);
           await new Promise(r => setTimeout(r, 8000));
           return fetchTollring(endpoint, method, body, true);
         }
-        throw new Error('API_ERROR:' + (data.Result.Description || 'Rate limit exceeded (0x1009)'));
+        throw new Error('RATE_LIMIT:' + (data.Result?.Description || 'Too many API requests. Will retry on next poll.'));
       }
 
-      if (res.status === 401 || res.status === 403) {
+      if (isAuthError(data) || ((res.status === 401 || res.status === 403) && !data.Result)) {
         const detail = data.Result ? JSON.stringify(data.Result) : '';
-        throw new Error('AUTH_FAILED:' + (data.Result?.Description || 'Tollring rejected the credentials.') + (detail ? ' ' + detail : ''));
+        throw new Error('AUTH_FAILED:' + (data.Result?.Description || 'API Authentication Failed.') + (detail ? ' ' + detail : ''));
       }
       if (res.status === 503 && data.error === 'DEMO_MODE') {
         throw new Error('DEMO_MODE');
@@ -1270,6 +1367,7 @@
       if (data.Result && data.Result.ErrorCode && data.Result.ErrorCode !== '0x0000') {
         throw new Error('API_ERROR:' + (data.Result.Description || data.Result.ErrorCode));
       }
+      hasConnectedOnce = true;
       return data;
     }
 
@@ -1282,20 +1380,9 @@
     }
 
     function startPolling() {
-      setTimeout(() => {
-        pollLiveCalls();
-        setInterval(pollLiveCalls, 10000);
-      }, 0);
-
-      setTimeout(() => {
-        pollTodayData();
-        setInterval(pollTodayData, 60000);
-      }, 3000);
-
-      setTimeout(() => {
-        pollYesterdayData();
-        setInterval(pollYesterdayData, 300000);
-      }, 6000);
+      pollAllData(true);
+      if (pollIntervalId) clearInterval(pollIntervalId);
+      pollIntervalId = setInterval(() => pollAllData(false), POLL_INTERVAL_MS);
     }
 
     function handleApiFailure(context, err) {
@@ -1311,10 +1398,20 @@
         renderEmptyDashboard();
         return true;
       }
+      if (err.message.startsWith('RATE_LIMIT:')) {
+        const msg = err.message.slice(11);
+        showError('4com API busy: ' + msg);
+        return true;
+      }
       if (err.message === 'AUTH_FAILED' || err.message.startsWith('AUTH_FAILED:')) {
         const msg = err.message.startsWith('AUTH_FAILED:')
           ? err.message.slice('AUTH_FAILED:'.length)
           : 'Tollring rejected the credentials. Check TOLLRING_USERNAME and TOLLRING_TOKEN in your environment variables.';
+        if (hasConnectedOnce) {
+          showError('Temporary API auth issue — keeping last data. Will retry automatically.');
+          debug('Auth error after successful connection (likely rate limit): ' + msg);
+          return true;
+        }
         showError(msg);
         showSetupPanel(msg);
         renderEmptyDashboard();
@@ -1322,6 +1419,10 @@
       }
       if (err.message.startsWith('API_ERROR:')) {
         showError('Tollring API error: ' + err.message.slice(10));
+        return true;
+      }
+      if (hasConnectedOnce) {
+        showError('Could not refresh call data. Will retry on next poll.');
         return true;
       }
       showError('Could not reach the call data API. Check your Netlify environment variables and try again.');
@@ -1335,10 +1436,10 @@
         lastKnownData.live = data;
         hideError();
         hideSetupPanel();
-        return data;
+        return tollringRecords(data);
       } catch (e) {
         handleApiFailure('GetLiveCalls', e);
-        return lastKnownData.live;
+        return tollringRecords(lastKnownData.live);
       }
     }
 
@@ -1358,7 +1459,8 @@
         return tollringRecords(data);
       } catch (e) {
         handleApiFailure('GetCallsByDate', e);
-        return offsetDays === -1 ? lastKnownData.yesterday : lastKnownData.today;
+        const cached = offsetDays === -1 ? lastKnownData.yesterday : lastKnownData.today;
+        return tollringRecords(cached);
       }
     }
 
@@ -1370,14 +1472,19 @@
       hideSetupPanel();
       showToast(reason || 'Running in demo mode');
       initDemoData();
+      pollAllData(true);
     }
 
     function renderEmptyDashboard() {
-      renderKpis([], [], 0);
-      renderDdiTable({}, {});
-      renderChart(new Array(24).fill(0), new Array(24).fill(0));
-      renderLiveCalls([]);
-      renderRecentCalls([]);
+      resetUiSnapshots();
+      updateStatsKpis([], [], true);
+      updateLiveKpi(0, true);
+      updateDdiTableCounts({}, {}, true);
+      setChartData([], []);
+      renderChart(true);
+      renderLiveCalls([], true);
+      renderRecentCalls([], true);
+      renderMissedCalls([], true);
       renderDonutCompare(0, 0);
       renderDonutMissed(0, 0);
       document.getElementById('topPerformerName').textContent = '--';
@@ -1390,9 +1497,7 @@
       hideSetupPanel();
       isDemoMode = false;
       document.getElementById('demoBadge').style.display = 'none';
-      pollLiveCalls();
-      pollTodayData();
-      pollYesterdayData();
+      pollAllData(true);
     }
 
     // ============================================================
@@ -1520,7 +1625,6 @@
         demoTodayCalls.push(newCall);
         addTickerEvent(newCall, dir === 'IU' ? 'Missed call' : 'Incoming call');
         if (dir === 'INC') showToast(`Incoming call on ${ddi.name}`);
-        processAllData();
       }
 
       if (Math.random() < 0.3) {
@@ -1534,7 +1638,13 @@
           }
         });
       }
-      pollLiveCalls();
+
+      refreshHistoricalUi(true);
+      liveCalls = tollringRecords(demoGetLiveCalls());
+      updateDdiStatuses(liveCalls);
+      if (renderLiveCalls(liveCalls)) startLiveTimers();
+      updateDdiStatusDots();
+      updateLiveKpi(liveCalls.length);
     }
 
     // ============================================================
@@ -1571,38 +1681,51 @@
       const total = calls.length;
       const answered = calls.filter(c => normaliseDirection(c) === 'INC').length;
       const missed = calls.filter(c => normaliseDirection(c) === 'IU').length;
-      const ringTimes = calls.filter(c => c.Ring_time > 0).map(c => c.Ring_time);
-      const avgRing = ringTimes.length ? ringTimes.reduce((a,b) => a+b, 0) / ringTimes.length : 0;
-      const answerRate = total > 0 ? Math.round((answered / total) * 100) : 0;
-      const missedRate = total > 0 ? Math.round((missed / total) * 100) : 0;
+      const outbound = calls.filter(c => normaliseDirection(c) === 'OUT').length;
+      const inbound = answered + missed;
+      const ringTimes = calls
+        .filter(c => normaliseDirection(c) === 'INC' && c.Ring_time > 0)
+        .map(c => c.Ring_time);
+      const avgRing = ringTimes.length ? ringTimes.reduce((a, b) => a + b, 0) / ringTimes.length : 0;
+      const answerRate = inbound > 0 ? Math.round((answered / inbound) * 100) : 0;
+      const missedRate = inbound > 0 ? Math.round((missed / inbound) * 100) : 0;
 
       const ddiCounts = {};
       DDI_LIST.forEach(d => { ddiCounts[d.ddi] = 0; });
       calls.forEach(c => {
-        const ddi = findDdiByPort(c.Port || c.DDIOrGroup);
+        const ddi = findDdiForCall(c);
         if (ddi) ddiCounts[ddi.ddi]++;
       });
 
       const hourlyToday = bucketByHour(calls);
-      return { total, answered, missed, avgRing, answerRate, missedRate, ddiCounts, hourlyToday };
+      const hourlyByDdi = bucketByHourPerDdi(calls);
+      return { total, inbound, outbound, answered, missed, avgRing, answerRate, missedRate, ddiCounts, hourlyToday, hourlyByDdi };
     }
 
     function processYesterdayCounts(calls) {
       const ddiCounts = {};
       DDI_LIST.forEach(d => { ddiCounts[d.ddi] = 0; });
       calls.forEach(c => {
-        const ddi = findDdiByPort(c.Port || c.DDIOrGroup);
+        const ddi = findDdiForCall(c);
         if (ddi) ddiCounts[ddi.ddi]++;
       });
-      const ringTimes = calls.filter(c => c.Ring_time > 0).map(c => c.Ring_time);
+      const answered = calls.filter(c => normaliseDirection(c) === 'INC').length;
+      const missed = calls.filter(c => normaliseDirection(c) === 'IU').length;
+      const outbound = calls.filter(c => normaliseDirection(c) === 'OUT').length;
+      const ringTimes = calls
+        .filter(c => normaliseDirection(c) === 'INC' && c.Ring_time > 0)
+        .map(c => c.Ring_time);
       const avgRing = ringTimes.length ? ringTimes.reduce((a, b) => a + b, 0) / ringTimes.length : 0;
       return {
         total: calls.length,
-        answered: calls.filter(c => normaliseDirection(c) === 'INC').length,
-        missed: calls.filter(c => normaliseDirection(c) === 'IU').length,
+        inbound: answered + missed,
+        outbound,
+        answered,
+        missed,
         avgRing,
         ddiCounts,
-        hourly: bucketByHour(calls)
+        hourly: bucketByHour(calls),
+        hourlyByDdi: bucketByHourPerDdi(calls)
       };
     }
 
@@ -1615,10 +1738,28 @@
       return buckets;
     }
 
+    function bucketByHourPerDdi(calls) {
+      const buckets = {};
+      DDI_LIST.forEach(d => { buckets[d.ddi] = new Array(24).fill(0); });
+      calls.forEach(c => {
+        const ddi = findDdiForCall(c);
+        if (!ddi) return;
+        const hour = getCallHour(c.Call_date);
+        if (hour !== null && hour >= 0 && hour < 24) buckets[ddi.ddi][hour]++;
+      });
+      return buckets;
+    }
+
+    function emptyHourlyByDdi() {
+      const buckets = {};
+      DDI_LIST.forEach(d => { buckets[d.ddi] = new Array(24).fill(0); });
+      return buckets;
+    }
+
     function updateDdiStatuses(live) {
       DDI_LIST.forEach(d => { ddiStatuses[d.ddi] = 'idle'; });
       live.forEach(call => {
-        const ddi = findDdiByDdiOrGroup(call.DDIOrGroup);
+        const ddi = findDdiByDdiOrGroup(call.DDIOrGroup || call.Extension);
         if (!ddi) return;
         const status = (call.Call_Status || '').toLowerCase();
         if (status.includes('ring')) ddiStatuses[ddi.ddi] = 'ringing';
@@ -1633,8 +1774,28 @@
         .slice(0, limit || 10);
     }
 
+    function getMissedCalls(calls, limit) {
+      return [...calls]
+        .filter(c => normaliseDirection(c) === 'IU')
+        .sort((a, b) => (b.Call_date || '').localeCompare(a.Call_date || ''))
+        .slice(0, limit || 15);
+    }
+
+    function formatCallerId(call) {
+      return call.Number || call.Caller_ID || '--';
+    }
+
+    function updateLastUpdated() {
+      const el = document.getElementById('lastUpdated');
+      const now = new Date();
+      const p = getLondonParts(now);
+      el.textContent = `Last updated: ${p.hour}:${p.minute}:${p.second}`;
+      el.classList.add('fresh');
+      setTimeout(() => el.classList.remove('fresh'), 3000);
+    }
+
     function addTickerEvent(call, label) {
-      const ddi = findDdiByPort(call.Port || call.DDIOrGroup) || findDdiByDdiOrGroup(call.DDIOrGroup);
+      const ddi = findDdiForCall(call) || findDdiByDdiOrGroup(call.DDIOrGroup);
       const timeMatch = (call.Call_date || '').match(/(\d{2}:\d{2})/);
       const time = timeMatch ? timeMatch[1] : getLondonParts(new Date()).hour + ':' + getLondonParts(new Date()).minute;
       tickerEvents.unshift({ time, ddi: ddi ? ddi.name : 'Unknown', label });
@@ -1644,18 +1805,40 @@
     // ============================================================
     // UI RENDER FUNCTIONS
     // ============================================================
-    function renderKpis(today, yesterday, liveCount) {
-      const t = processCallsData(today);
-      const y = processYesterdayCounts(yesterday);
-
-      const totalPct = pctChange(t.total, y.total);
-      setKpiValue('kpiTotalVal', t.total, 'kpiTotalSub', formatPct(totalPct), totalPct >= 0 ? 'up' : 'down');
-
+    function updateLiveKpi(liveCount, force) {
+      const key = String(liveCount);
+      if (!force && key === uiSnapshots.liveKpiKey) return;
+      uiSnapshots.liveKpiKey = key;
       setKpiValue('kpiLiveVal', liveCount, 'kpiLiveSub',
         liveCount > 0 ? 'Currently active' : 'All lines idle', '');
+      document.getElementById('kpiLive').classList.toggle('pulse-live', liveCount > 0);
+    }
 
-      const liveTile = document.getElementById('kpiLive');
-      liveTile.classList.toggle('pulse-live', liveCount > 0);
+    function updateStatsKpis(today, yesterday, force) {
+      const t = processCallsData(today);
+      const y = processYesterdayCounts(yesterday);
+      const key = JSON.stringify({
+        inbound: t.inbound,
+        outbound: t.outbound,
+        answered: t.answered,
+        missed: t.missed,
+        avgRing: Math.round(t.avgRing * 10),
+        answerRate: t.answerRate,
+        missedRate: t.missedRate,
+        yInbound: y.inbound,
+        yOutbound: y.outbound,
+        yAnswered: y.answered,
+        yMissed: y.missed,
+        yAvgRing: Math.round(y.avgRing * 10)
+      });
+      if (!force && key === uiSnapshots.kpiStatsKey) return;
+      uiSnapshots.kpiStatsKey = key;
+
+      const inboundPct = pctChange(t.inbound, y.inbound);
+      setKpiValue('kpiInboundVal', t.inbound, 'kpiInboundSub', formatPct(inboundPct), inboundPct >= 0 ? 'up' : 'down');
+
+      const outboundPct = pctChange(t.outbound, y.outbound);
+      setKpiValue('kpiOutboundVal', t.outbound, 'kpiOutboundSub', formatPct(outboundPct), outboundPct >= 0 ? 'up' : 'down');
 
       const ansPct = pctChange(t.answered, y.answered);
       setKpiValue('kpiAnsweredVal', t.answered, 'kpiAnsweredSub',
@@ -1670,15 +1853,20 @@
       if (prevKpiValues.kpiAvgRtVal !== avgStr) flashElement(avgEl);
       prevKpiValues.kpiAvgRtVal = avgStr;
       avgEl.textContent = avgStr;
-      const avgSub = document.getElementById('kpiAvgRtSub');
-      avgSub.innerHTML = formatPct(pctChange(Math.round(t.avgRing), Math.round(y.avgRing))) + goalHtml;
+      document.getElementById('kpiAvgRtSub').innerHTML =
+        formatPct(pctChange(Math.round(t.avgRing), Math.round(y.avgRing))) + goalHtml;
 
-      renderDonutCompare(t.total, y.total);
+      renderDonutCompare(t.inbound, y.inbound);
       renderDonutMissed(t.missed, t.answered);
       renderTopPerformer(t.ddiCounts, y.ddiCounts);
     }
 
-    function renderDdiTable(todayCounts, yesterdayCounts) {
+    function renderKpis(today, yesterday, liveCount, force) {
+      updateLiveKpi(liveCount, force);
+      updateStatsKpis(today, yesterday, force);
+    }
+
+    function renderDdiTableFull(todayCounts, yesterdayCounts) {
       const tbody = document.getElementById('ddiTableBody');
       tbody.innerHTML = DDI_LIST.map((ddi, idx) => {
         const count = todayCounts[ddi.ddi] || 0;
@@ -1699,51 +1887,117 @@
       }).join('');
     }
 
-    function renderLiveCalls(live) {
+    function updateDdiStatusDots() {
+      const key = JSON.stringify(ddiStatuses);
+      if (key === uiSnapshots.ddiStatusKey) return;
+      uiSnapshots.ddiStatusKey = key;
+      const tbody = document.getElementById('ddiTableBody');
+      if (!tbody || !tbody.children.length) return;
+      DDI_LIST.forEach((ddi, idx) => {
+        const tr = tbody.children[idx];
+        if (!tr) return;
+        const dot = tr.querySelector('.status-dot');
+        const status = ddiStatuses[ddi.ddi] || 'idle';
+        if (dot) {
+          dot.className = 'status-dot ' + status;
+          dot.title = status;
+        }
+      });
+    }
+
+    function updateDdiTableCounts(todayCounts, yesterdayCounts, force) {
+      const key = JSON.stringify({ todayCounts, yesterdayCounts });
+      if (!force && key === uiSnapshots.ddiCountsKey) return;
+      uiSnapshots.ddiCountsKey = key;
+
+      const tbody = document.getElementById('ddiTableBody');
+      if (!tbody || !tbody.children.length) {
+        renderDdiTableFull(todayCounts, yesterdayCounts);
+        uiSnapshots.ddiStatusKey = JSON.stringify(ddiStatuses);
+        return;
+      }
+
+      DDI_LIST.forEach((ddi, idx) => {
+        const tr = tbody.children[idx];
+        if (!tr) return;
+        const count = todayCounts[ddi.ddi] || 0;
+        const yCount = yesterdayCounts[ddi.ddi] || 0;
+        const pct = pctChange(count, yCount);
+        const pctText = pct > 0 ? `+${pct}%` : pct < 0 ? `${pct}%` : '0%';
+        const pctClass = pct > 0 ? 'up' : pct < 0 ? 'down' : 'neutral';
+        const countEl = tr.querySelector('.ddi-count');
+        const pctEl = tr.querySelector('.pct-change');
+        if (countEl) countEl.textContent = count;
+        if (pctEl) {
+          pctEl.textContent = pctText;
+          pctEl.className = 'pct-change ' + pctClass;
+        }
+      });
+    }
+
+    function renderDdiTable(todayCounts, yesterdayCounts, force) {
+      updateDdiTableCounts(todayCounts, yesterdayCounts, force);
+      updateDdiStatusDots();
+    }
+
+    function renderLiveCalls(live, force) {
+      const key = fingerprintLive(live || []);
+      if (!force && key === uiSnapshots.liveKey) return false;
+      uiSnapshots.liveKey = key;
+
       const list = document.getElementById('liveCallsList');
       if (!live || live.length === 0) {
         list.innerHTML = `<li class="empty-state">
           <div class="empty-state-icon">&#128222;</div>
           <div>No active calls</div>
         </li>`;
-        return;
+        return true;
       }
       list.innerHTML = live.map((call, idx) => {
         const ddi = call._ddi || findDdiByDdiOrGroup(call.DDIOrGroup);
-        const colour = AVATAR_COLOURS[DDI_LIST.indexOf(ddi) % AVATAR_COLOURS.length];
+        const ddiIdx = ddi ? DDI_LIST.indexOf(ddi) : 0;
+        const colour = AVATAR_COLOURS[ddiIdx >= 0 ? ddiIdx % AVATAR_COLOURS.length : 0];
+        const label = ddi ? ddi.name : (call.Extension || 'Unknown line');
+        const avatar = label.charAt(0).toUpperCase();
         const status = (call.Call_Status || '').toLowerCase();
         let badgeClass = 'connecting', badgeText = 'Connecting';
         if (status.includes('ring')) { badgeClass = 'ringing'; badgeText = 'Ringing'; }
-        else if (status.includes('connect')) { badgeClass = 'incall'; badgeText = 'In Call'; }
-        const elapsed = call.TimeInCurrentStatus || 0;
+        else if (status.includes('on call') || status.includes('connect')) { badgeClass = 'incall'; badgeText = 'In Call'; }
+        const elapsed = parseStatusSeconds(call.TimeInCurrentStatus);
         return `<li class="call-item" data-idx="${idx}" data-elapsed="${elapsed}" data-start="${Date.now()}">
-          <div class="call-avatar" style="background:${colour}">${ddi.name.charAt(0)}</div>
+          <div class="call-avatar" style="background:${colour}">${avatar}</div>
           <div class="call-info">
-            <div class="call-info-name">${ddi.name}</div>
-            <div class="call-info-num">${call.Caller_ID || call.DDIOrGroup}</div>
+            <div class="call-info-name">${label}</div>
+            <div class="call-info-num">${call.Caller_ID || call.DDIOrGroup || call.Number || '--'}</div>
           </div>
           <div class="call-timer" id="liveTimer${idx}">${formatTime(elapsed)}</div>
           <span class="status-badge ${badgeClass}">${badgeText}</span>
           <div class="call-loading-bar"></div>
         </li>`;
       }).join('');
+      return true;
     }
 
-    function renderRecentCalls(calls) {
+    function renderRecentCalls(calls, force) {
       const recent = getRecentCalls(calls, 10);
+      const key = recent.map(c => callRecordKey(c)).join('|') || '0';
+      if (!force && key === uiSnapshots.recentKey) return;
+      uiSnapshots.recentKey = key;
+
       const tbody = document.getElementById('recentCallsBody');
       if (recent.length === 0) {
         tbody.innerHTML = '<tr><td colspan="4" class="empty-state" style="padding:20px;">No calls yet today</td></tr>';
         return;
       }
       tbody.innerHTML = recent.map(c => {
-        const ddi = findDdiByPort(c.Port || c.DDIOrGroup);
+        const ddi = findDdiForCall(c);
         const timeMatch = (c.Call_date || '').match(/(\d{2}:\d{2})/);
         const time = timeMatch ? timeMatch[1] : '--:--';
         const dur = formatDuration(c.Talk_time || c.Duration || 0);
+        const dir = normaliseDirection(c);
         let dirIcon, dirClass;
-        if (c.Direction === 'IU') { dirIcon = '\u2715'; dirClass = 'dir-missed'; }
-        else if (c.Direction === 'OUT') { dirIcon = '\u2191'; dirClass = 'dir-out'; }
+        if (dir === 'IU') { dirIcon = '\u2715'; dirClass = 'dir-missed'; }
+        else if (dir === 'OUT') { dirIcon = '\u2191'; dirClass = 'dir-out'; }
         else { dirIcon = '\u2193'; dirClass = 'dir-inc'; }
         return `<tr>
           <td>${time}</td>
@@ -1754,7 +2008,40 @@
       }).join('');
     }
 
-    function renderTicker() {
+    function renderMissedCalls(calls, force) {
+      const missed = getMissedCalls(calls, 15);
+      const key = missed.map(c => callRecordKey(c)).join('|') || '0';
+      if (!force && key === uiSnapshots.missedKey) return;
+      uiSnapshots.missedKey = key;
+
+      const countEl = document.getElementById('missedPanelCount');
+      const totalMissed = calls.filter(c => normaliseDirection(c) === 'IU').length;
+      if (countEl) countEl.textContent = totalMissed;
+
+      const tbody = document.getElementById('missedCallsBody');
+      if (missed.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="empty-state" style="padding:20px;">No missed calls today</td></tr>';
+        return;
+      }
+      tbody.innerHTML = missed.map(c => {
+        const ddi = findDdiForCall(c);
+        const timeMatch = (c.Call_date || '').match(/(\d{2}:\d{2})/);
+        const time = timeMatch ? timeMatch[1] : '--:--';
+        const wait = c.Ring_time > 0 ? formatTime(c.Ring_time) : '0:00';
+        return `<tr>
+          <td>${time}</td>
+          <td>${ddi ? ddi.name : 'Unknown'}</td>
+          <td>${formatCallerId(c)}</td>
+          <td>${wait}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function renderTicker(force) {
+      const key = tickerEvents.map(e => `${e.time}:${e.ddi}:${e.label}`).join('|') || '0';
+      if (!force && key === uiSnapshots.tickerKey) return;
+      uiSnapshots.tickerKey = key;
+
       const content = document.getElementById('tickerContent');
       if (tickerEvents.length === 0) {
         const items = DDI_LIST.slice(0, 5).map(d =>
@@ -1792,13 +2079,41 @@
     // ============================================================
     // CHART
     // ============================================================
-    function renderChart(todayHourly, yesterdayHourly) {
+    function renderChart(force) {
+      if (!chartDataCache) return;
+      const { todayTotal, yesterdayTotal, todayByDdi, yesterdayByDdi } = chartDataCache;
+      const selectionKey = [...chartSelectedDdis].sort().join(',');
+      const dataKey = todayTotal.join(',') + '|' + yesterdayTotal.join(',') + '|' +
+        DDI_LIST.map(d => (todayByDdi[d.ddi] || []).join(',')).join('|');
+      const fullKey = dataKey + '::' + selectionKey;
+      if (!force && fullKey === uiSnapshots.chartKey) return;
+      uiSnapshots.chartKey = fullKey;
+
+      const visibleSeries = [];
+      chartSelectedDdis.forEach(ddiKey => {
+        const idx = DDI_LIST.findIndex(d => d.ddi === ddiKey);
+        if (idx < 0) return;
+        const ddi = DDI_LIST[idx];
+        visibleSeries.push({
+          name: ddi.name,
+          colour: AVATAR_COLOURS[idx % AVATAR_COLOURS.length],
+          today: todayByDdi[ddi.ddi] || new Array(24).fill(0),
+          yesterday: yesterdayByDdi[ddi.ddi] || new Array(24).fill(0)
+        });
+      });
+
+      const allValues = [
+        ...todayTotal,
+        ...yesterdayTotal,
+        ...visibleSeries.flatMap(s => [...s.today, ...s.yesterday])
+      ];
+      const peak = Math.max(...allValues, 0);
+      const maxVal = Math.max(peak, 1);
+
       const svg = document.getElementById('chartSvg');
       const W = 600, H = 220, padL = 44, padR = 16, padT = 20, padB = 32;
       const chartW = W - padL - padR;
       const chartH = H - padT - padB;
-      const peak = Math.max(...todayHourly, ...yesterdayHourly, 0);
-      const maxVal = Math.max(peak, 1);
 
       function toPoints(data) {
         return data.map((v, i) => {
@@ -1807,9 +2122,6 @@
           return { x, y, v, hour: i };
         });
       }
-
-      const todayPts = toPoints(todayHourly);
-      const yestPts = toPoints(yesterdayHourly);
 
       function linePath(pts) {
         return pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
@@ -1825,8 +2137,8 @@
       const uniqueYTicks = [...new Set(yTicks)];
 
       let html = `<defs>
-        <linearGradient id="todayGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#0d77fe" stop-opacity="0.22"/>
+        <linearGradient id="totalGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0d77fe" stop-opacity="0.18"/>
           <stop offset="100%" stop-color="#0d77fe" stop-opacity="0.02"/>
         </linearGradient>
       </defs>`;
@@ -1841,27 +2153,49 @@
         const x = padL + (h / 23) * chartW;
         html += `<text x="${x}" y="${H - 8}" fill="#64748b" font-size="9" text-anchor="middle" font-family="Inter,sans-serif">${String(h).padStart(2,'0')}:00</text>`;
       });
-
       html += `<text x="${padL + chartW}" y="${H - 8}" fill="#64748b" font-size="9" text-anchor="middle" font-family="Inter,sans-serif">24:00</text>`;
 
-      html += `<path d="${areaPath(todayPts)}" fill="url(#todayGrad)"/>`;
-      html += `<path d="${linePath(yestPts)}" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3"/>`;
-      html += `<path d="${linePath(todayPts)}" fill="none" stroke="#0d77fe" stroke-width="2.5"/>`;
+      visibleSeries.forEach(s => {
+        html += `<path d="${linePath(toPoints(s.yesterday))}" fill="none" stroke="${s.colour}" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.45" pointer-events="none"/>`;
+      });
 
-      todayPts.forEach(p => {
-        if (p.v > 0) {
-          html += `<circle cx="${p.x}" cy="${p.y}" r="3.5" fill="#0d77fe" stroke="#fff" stroke-width="1.5"/>`;
-        }
-        html += `<circle cx="${p.x}" cy="${p.y}" r="10" fill="transparent" class="chart-hit" data-hour="${p.hour}" data-today="${p.v}" data-yest="${yestPts[p.hour].v}" style="cursor:pointer"/>`;
+      visibleSeries.forEach(s => {
+        const pts = toPoints(s.today);
+        html += `<path d="${linePath(pts)}" fill="none" stroke="${s.colour}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+        pts.forEach(p => {
+          if (p.v > 0) html += `<circle cx="${p.x}" cy="${p.y}" r="2.5" fill="${s.colour}" stroke="#fff" stroke-width="1"/>`;
+        });
+      });
+
+      const totalPts = toPoints(todayTotal);
+      const yestPts = toPoints(yesterdayTotal);
+      html += `<path d="${areaPath(totalPts)}" fill="url(#totalGrad)"/>`;
+      html += `<path d="${linePath(yestPts)}" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3" pointer-events="none"/>`;
+      html += `<path d="${linePath(totalPts)}" fill="none" stroke="#0d77fe" stroke-width="2.5" stroke-linejoin="round"/>`;
+      totalPts.forEach(p => {
+        if (p.v > 0) html += `<circle cx="${p.x}" cy="${p.y}" r="3" fill="#0d77fe" stroke="#fff" stroke-width="1.5"/>`;
+        html += `<circle cx="${p.x}" cy="${p.y}" r="14" fill="transparent" class="chart-hit" data-hour="${p.hour}" data-today="${p.v}" data-yest="${yesterdayTotal[p.hour]}" style="cursor:pointer"/>`;
       });
 
       svg.innerHTML = html;
+      renderChartLegend(todayByDdi);
 
       svg.querySelectorAll('.chart-hit').forEach(circle => {
         circle.addEventListener('mouseenter', e => {
           const hour = parseInt(circle.dataset.hour, 10);
           const tooltip = document.getElementById('chartTooltip');
-          tooltip.innerHTML = `<strong>${String(hour).padStart(2,'0')}:00 - ${String(hour).padStart(2,'0')}:59</strong><br>Today: ${circle.dataset.today} calls<br>Yesterday: ${circle.dataset.yest} calls`;
+          const hourLabel = `${String(hour).padStart(2,'0')}:00 – ${String(hour).padStart(2,'0')}:59`;
+          const todayCount = circle.dataset.today;
+          const yestCount = circle.dataset.yest;
+          let html = `<strong>${hourLabel}</strong><br>Today: ${todayCount} calls<br>Yesterday: ${yestCount} calls`;
+          visibleSeries.forEach(s => {
+            const t = s.today[hour];
+            const y = s.yesterday[hour];
+            if (t > 0 || y > 0) {
+              html += `<br><span style="color:${s.colour};font-weight:600">${s.name}</span>: ${t} today · ${y} yest`;
+            }
+          });
+          tooltip.innerHTML = html;
           tooltip.classList.add('visible');
           const rect = document.getElementById('chartContainer').getBoundingClientRect();
           tooltip.style.left = (e.clientX - rect.left - 40) + 'px';
@@ -1871,6 +2205,31 @@
           document.getElementById('chartTooltip').classList.remove('visible');
         });
       });
+    }
+
+    function renderChartLegend(todayByDdi) {
+      const legend = document.getElementById('chartLegend');
+      let html = `<button type="button" class="legend-toggle active locked" data-ddi="__total__" title="Always shown">
+        <span class="legend-line total"></span>Total</button>`;
+      DDI_LIST.forEach((ddi, idx) => {
+        const colour = AVATAR_COLOURS[idx % AVATAR_COLOURS.length];
+        const active = chartSelectedDdis.has(ddi.ddi);
+        const count = (todayByDdi[ddi.ddi] || []).reduce((a, b) => a + b, 0);
+        html += `<button type="button" class="legend-toggle${active ? ' active' : ''}" data-ddi="${ddi.ddi}">
+          <span class="legend-line" style="background:${colour}"></span>${ddi.name} (${count})</button>`;
+      });
+      legend.innerHTML = html;
+    }
+
+    function setChartData(today, yesterday) {
+      const t = processCallsData(today);
+      const y = processYesterdayCounts(yesterday);
+      chartDataCache = {
+        todayTotal: t.hourlyToday,
+        yesterdayTotal: y.hourly,
+        todayByDdi: t.hourlyByDdi,
+        yesterdayByDdi: y.hourlyByDdi
+      };
     }
 
     // ============================================================
@@ -1894,7 +2253,7 @@
       const pct = pctChange(todayTotal, yestTotal);
       const sign = pct >= 0 ? '+' : '';
       renderDonut('donutCompare', todayTotal, todayTotal + yestTotal, `${sign}${pct}%`, pct >= 0 ? '#059669' : '#dc2626');
-      document.getElementById('donutCompareLabel').textContent = `${todayTotal} today vs ${yestTotal} yesterday`;
+      document.getElementById('donutCompareLabel').textContent = `${todayTotal} inbound today vs ${yestTotal} yesterday`;
     }
 
     function renderDonutMissed(missed, answered) {
@@ -1902,50 +2261,6 @@
       const rate = total > 0 ? Math.round((missed / total) * 100) : 0;
       renderDonut('donutMissed', missed, total || 1, String(missed), '#dc2626');
       document.getElementById('donutMissedLabel').textContent = `${rate}% missed rate`;
-    }
-
-    // ============================================================
-    // CLOCK & WEATHER
-    // ============================================================
-    function updateClock() {
-      const now = new Date();
-      const p = getLondonParts(now);
-      document.getElementById('clockTime').textContent = `${p.hour}:${p.minute}`;
-      const dayFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', weekday: 'short', day: 'numeric', month: 'short' });
-      document.getElementById('clockDate').textContent = dayFmt.format(now);
-    }
-
-    async function fetchWeather() {
-      const weatherEl = document.getElementById('weatherDisplay');
-      let lat = 52.4862, lon = -1.8904;
-      try {
-        if (navigator.geolocation) {
-          const pos = await new Promise((res, rej) => {
-            navigator.geolocation.getCurrentPosition(res, rej, { timeout: 5000 });
-          });
-          lat = pos.coords.latitude;
-          lon = pos.coords.longitude;
-        }
-      } catch (_) { /* default to Birmingham */ }
-
-      try {
-        const url = `https://wttr.in/${lat},${lon}?format=j1`;
-        const res = await fetch(url);
-        const data = await res.json();
-        const cur = data.current_condition[0];
-        const temp = cur.temp_C;
-        const code = parseInt(cur.weatherCode);
-        const icons = { sunny: '\u2600\uFE0F', cloudy: '\u2601\uFE0F', rain: '\u2614', snow: '\u2744\uFE0F', fog: '\u1F32B\uFE0F' };
-        let icon = icons.cloudy;
-        if ([113].includes(code)) icon = icons.sunny;
-        else if ([176,293,296,299,302,305,308,311,314,353,356].includes(code)) icon = icons.rain;
-        else if ([227,230,323,326,329,332,335,338,371].includes(code)) icon = icons.snow;
-        document.getElementById('weatherIcon').textContent = icon;
-        document.getElementById('weatherTemp').textContent = `${temp}\u00B0C`;
-      } catch (_) {
-        document.getElementById('weatherIcon').textContent = '\u2601\uFE0F';
-        document.getElementById('weatherTemp').textContent = '--\u00B0C';
-      }
     }
 
     // ============================================================
@@ -1968,43 +2283,71 @@
     // ============================================================
     // PROCESS ALL & POLLING
     // ============================================================
-    function processAllData() {
+    function refreshHistoricalUi(force) {
       const today = isDemoMode ? demoTodayCalls : todayCalls;
       const yesterday = isDemoMode ? demoYesterdayCalls : yesterdayCalls;
       const t = processCallsData(today);
       const y = processYesterdayCounts(yesterday);
-      renderKpis(today, yesterday, liveCalls.length);
-      renderDdiTable(t.ddiCounts, y.ddiCounts);
-      renderChart(t.hourlyToday, y.hourly);
-      renderRecentCalls(today);
-      renderTicker();
+      updateStatsKpis(today, yesterday, force);
+      updateDdiTableCounts(t.ddiCounts, y.ddiCounts, force);
+      setChartData(today, yesterday);
+      renderChart(force);
+      renderRecentCalls(today, force);
+      renderMissedCalls(today, force);
+      renderTicker(force);
     }
 
-    async function pollLiveCalls() {
-      const data = await getLiveCalls();
-      liveCalls = tollringRecords(data);
-      updateDdiStatuses(liveCalls);
-      renderLiveCalls(liveCalls);
-      startLiveTimers();
-      const today = isDemoMode ? demoTodayCalls : todayCalls;
-      const yesterday = isDemoMode ? demoYesterdayCalls : yesterdayCalls;
-      renderKpis(today, yesterday, liveCalls.length);
-      renderDdiTable(
-        processCallsData(today).ddiCounts,
-        processYesterdayCounts(yesterday).ddiCounts
-      );
-    }
+    async function pollAllData(force) {
+      if (isPolling && !force) return;
+      isPolling = true;
+      try {
+        if (isDemoMode) {
+          todayCalls = demoTodayCalls;
+          yesterdayCalls = demoYesterdayCalls;
+          liveCalls = tollringRecords(demoGetLiveCalls());
+          updateDdiStatuses(liveCalls);
+          if (renderLiveCalls(liveCalls, force)) startLiveTimers();
+          updateDdiStatusDots();
+          updateLiveKpi(liveCalls.length, force);
+          refreshHistoricalUi(force);
+          updateLastUpdated();
+          return;
+        }
 
-    async function pollTodayData() {
-      todayCalls = await getCallsByDate(0);
-      if (!Array.isArray(todayCalls)) todayCalls = [];
-      processAllData();
-    }
+        const prevToday = todayCalls;
 
-    async function pollYesterdayData() {
-      yesterdayCalls = await getCallsByDate(-1);
-      if (!Array.isArray(yesterdayCalls)) yesterdayCalls = [];
-      processAllData();
+        liveCalls = await getLiveCalls();
+        if (!Array.isArray(liveCalls)) liveCalls = [];
+        updateDdiStatuses(liveCalls);
+        if (renderLiveCalls(liveCalls, force)) startLiveTimers();
+        updateDdiStatusDots();
+        updateLiveKpi(liveCalls.length, force);
+
+        const nextToday = await getCallsByDate(0);
+        if (Array.isArray(nextToday)) {
+          const todayKey = fingerprintCalls(nextToday);
+          if (prevToday.length > 0 && todayKey !== uiSnapshots.todayKey) {
+            findNewCalls(prevToday, nextToday).forEach(c => {
+              const dir = normaliseDirection(c);
+              const label = dir === 'IU' ? 'Missed call' : dir === 'OUT' ? 'Outgoing call' : 'Incoming call';
+              addTickerEvent(c, label);
+            });
+          }
+          todayCalls = nextToday;
+          uiSnapshots.todayKey = todayKey;
+        }
+
+        const nextYesterday = await getCallsByDate(-1);
+        if (Array.isArray(nextYesterday)) {
+          yesterdayCalls = nextYesterday;
+          uiSnapshots.yesterdayKey = fingerprintCalls(nextYesterday);
+        }
+
+        refreshHistoricalUi(force);
+        updateLastUpdated();
+      } finally {
+        isPolling = false;
+      }
     }
 
     // ============================================================
@@ -2017,14 +2360,19 @@
       }
     });
 
+    document.getElementById('chartLegend').addEventListener('click', e => {
+      const btn = e.target.closest('.legend-toggle');
+      if (!btn || btn.classList.contains('locked')) return;
+      const ddi = btn.dataset.ddi;
+      if (chartSelectedDdis.has(ddi)) chartSelectedDdis.delete(ddi);
+      else chartSelectedDdis.add(ddi);
+      renderChart(true);
+    });
+
     // ============================================================
     // INIT
     // ============================================================
     async function init() {
-      updateClock();
-      setInterval(updateClock, 1000);
-      fetchWeather();
-
       if (DEMO_MODE) {
         activateDemoMode('Demo mode is enabled in the dashboard config.');
       } else {

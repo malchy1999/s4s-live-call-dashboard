@@ -1,13 +1,18 @@
-const MIN_GAP_MS = 6000;
+const MIN_GAP_MS = 8000;
 let lastRequestAt = 0;
+let requestGate = Promise.resolve();
 
 async function waitForGap() {
-  const now = Date.now();
-  const elapsed = now - lastRequestAt;
-  if (lastRequestAt > 0 && elapsed < MIN_GAP_MS) {
-    await new Promise(r => setTimeout(r, MIN_GAP_MS - elapsed));
-  }
-  lastRequestAt = Date.now();
+  const run = requestGate.then(async () => {
+    const now = Date.now();
+    const elapsed = now - lastRequestAt;
+    if (lastRequestAt > 0 && elapsed < MIN_GAP_MS) {
+      await new Promise(r => setTimeout(r, MIN_GAP_MS - elapsed));
+    }
+    lastRequestAt = Date.now();
+  });
+  requestGate = run.catch(() => {});
+  await run;
 }
 
 exports.handler = async (event) => {
@@ -27,8 +32,8 @@ exports.handler = async (event) => {
   }
 
   // Build auth header from env vars
-  const username = process.env.TOLLRING_USERNAME;
-  const token    = process.env.TOLLRING_TOKEN;
+  const username = (process.env.TOLLRING_USERNAME || '').trim();
+  const token    = (process.env.TOLLRING_TOKEN || '').trim();
 
   if (!username || !token) {
     return {
