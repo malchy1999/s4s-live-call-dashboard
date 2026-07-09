@@ -942,25 +942,25 @@
 
   <script>
     // ============================================================
-    // CONFIGURATION - edit these before going live
+    // CONFIGURATION
+    // Tollring credentials are stored in Netlify environment variables.
+    // See .env.example for local development.
     // ============================================================
-    const TOLLRING_USERNAME = 'YOUR_EMAIL@domain.com'; // CONFIGURE ME
-    const TOLLRING_TOKEN    = 'YOUR_TOKEN_ID_HERE';    // CONFIGURE ME
-    const TOLLRING_BASE     = 'https://YOUR_ICALLSUITE_HOST/api/v4'; // CONFIGURE ME
-    const DEMO_MODE         = true; // Set false when credentials are ready
-    const DEBUG             = false;
+    const API_BASE = '/api';
+    const DEMO_MODE = false; // Set true to force demo data without calling the API
+    const DEBUG = false;
 
     // Replace placeholder numbers with your real garage DDIs before going live
     const DDI_LIST = [
-      { name: 'A1',         number: '01214501001', ddi: '+441214501001' },
-      { name: 'Beds',       number: '01214502001', ddi: '+441214502001' },
-      { name: 'Manchester', number: '01214503001', ddi: '+441214503001' },
-      { name: 'Bristol',    number: '01214504001', ddi: '+441214504001' },
-      { name: 'Main',       number: '01214505001', ddi: '+441214505001' },
-      { name: 'Leeds',      number: '01214506001', ddi: '+441214506001' },
-      { name: 'South-east', number: '01214507001', ddi: '+441214507001' },
-      { name: 'Midlands',   number: '01214508001', ddi: '+441214508001' },
-      { name: 'London',     number: '01214509001', ddi: '+441214509001' },
+      { name: 'A1',         number: '01767669575', ddi: '+441767669575' },
+      { name: 'Beds',       number: '01582320570', ddi: '+441582320570' },
+      { name: 'Manchester', number: '01616740142', ddi: '+441616740142' },
+      { name: 'Bristol',    number: '01174567065', ddi: '+441174567065' },
+      { name: 'Main',       number: '01932503647', ddi: '+441932503647' },
+      { name: 'Leeds',      number: '01133231775', ddi: '+441133231775' },
+      { name: 'South-east', number: '01580239610', ddi: '+441580239610' },
+      { name: 'Midlands',   number: '01922666376', ddi: '+441922666376' },
+      { name: 'London',     number: '02039056741', ddi: '+442039056741' },
     ];
 
     const AVATAR_COLOURS = ['#0d77fe','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#f97316','#6366f1'];
@@ -1135,42 +1135,50 @@
     // ============================================================
     // API FUNCTIONS
     // ============================================================
-    async function fetchTollring(endpoint, method, body) {
-      const authHeader = 'Basic ' + btoa(TOLLRING_USERNAME + ':' + TOLLRING_TOKEN);
+    async function fetchApi(path, method, body) {
       const opts = {
         method: method || 'GET',
         headers: {
-          'Authorization': authHeader,
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         }
       };
       if (body) opts.body = JSON.stringify(body);
 
-      const res = await fetch(TOLLRING_BASE + endpoint, opts);
+      const res = await fetch(API_BASE + path, opts);
+      let data = {};
+      try {
+        data = await res.json();
+      } catch (_) {
+        data = {};
+      }
+
       if (res.status === 401 || res.status === 403) {
         throw new Error('AUTH_FAILED');
+      }
+      if (res.status === 503 && (data.error === 'NOT_CONFIGURED' || data.error === 'DEMO_MODE')) {
+        throw new Error('NOT_CONFIGURED');
       }
       if (!res.ok) {
         throw new Error(`API error: ${res.status}`);
       }
-      return res.json();
+      return data;
     }
 
-    function queuedFetch(endpoint, method, body) {
-      return apiQueue.add(() => fetchTollring(endpoint, method, body));
+    function queuedFetch(path, method, body) {
+      return apiQueue.add(() => fetchApi(path, method, body));
     }
 
     async function getLiveCalls() {
       if (isDemoMode) return demoGetLiveCalls();
       try {
-        const data = await queuedFetch('/GetLiveCalls');
+        const data = await queuedFetch('/live-calls', 'GET');
         lastKnownData.live = data;
         hideError();
         return data;
       } catch (e) {
         debug('GetLiveCalls failed: ' + e.message);
-        if (e.message === 'AUTH_FAILED') activateDemoMode();
+        if (e.message === 'AUTH_FAILED' || e.message === 'NOT_CONFIGURED') activateDemoMode();
         return lastKnownData.live;
       }
     }
@@ -1180,7 +1188,7 @@
       const range = getDateRange(offsetDays || 0);
       const body = { ...range, Directions: 'INC,IU,OUT' };
       try {
-        const data = await queuedFetch('/GetCallsByDate', 'POST', body);
+        const data = await queuedFetch('/calls-by-date', 'POST', body);
         if (offsetDays === -1) {
           lastKnownData.yesterday = data;
         } else {
@@ -1190,7 +1198,7 @@
         return Array.isArray(data) ? data : (data.Calls || data.calls || []);
       } catch (e) {
         debug('GetCallsByDate failed: ' + e.message);
-        if (e.message === 'AUTH_FAILED') activateDemoMode();
+        if (e.message === 'AUTH_FAILED' || e.message === 'NOT_CONFIGURED') activateDemoMode();
         return offsetDays === -1 ? lastKnownData.yesterday : lastKnownData.today;
       }
     }
@@ -1199,17 +1207,15 @@
       if (isDemoMode) return;
       isDemoMode = true;
       enableDemoBadge();
-      showToast('Switched to demo mode - configure API credentials to go live');
+      showToast('Switched to demo mode - add Tollring env vars in Netlify to go live');
       initDemoData();
     }
 
     function retryConnection() {
       hideError();
-      isDemoMode = DEMO_MODE;
-      if (!DEMO_MODE) {
-        pollLiveCalls();
-        pollTodayData();
-      }
+      isDemoMode = false;
+      pollLiveCalls();
+      pollTodayData();
     }
 
     // ============================================================
