@@ -1156,17 +1156,43 @@
       if (res.status === 401 || res.status === 403) {
         throw new Error('AUTH_FAILED');
       }
-      if (res.status === 503 && (data.error === 'NOT_CONFIGURED' || data.error === 'DEMO_MODE')) {
-        throw new Error('NOT_CONFIGURED');
+      if (res.status === 503 && data.error === 'DEMO_MODE') {
+        throw new Error('DEMO_MODE');
+      }
+      if (res.status === 503 && data.error === 'NOT_CONFIGURED') {
+        throw new Error('CONFIG:' + (data.message || 'Tollring is not configured.'));
       }
       if (!res.ok) {
-        throw new Error(`API error: ${res.status}`);
+        const detail = data.message || data.error || res.status;
+        throw new Error('API_ERROR:' + detail);
       }
       return data;
     }
 
     function queuedFetch(path, method, body) {
       return apiQueue.add(() => fetchApi(path, method, body));
+    }
+
+    function handleApiFailure(context, err) {
+      debug(context + ' failed: ' + err.message);
+      if (err.message === 'DEMO_MODE') {
+        activateDemoMode('Server demo mode is enabled.');
+        return true;
+      }
+      if (err.message.startsWith('CONFIG:')) {
+        showError(err.message.slice(7));
+        return true;
+      }
+      if (err.message === 'AUTH_FAILED') {
+        showError('Tollring rejected the credentials. Check TOLLRING_USERNAME and TOLLRING_TOKEN in your environment variables.');
+        return true;
+      }
+      if (err.message.startsWith('API_ERROR:')) {
+        showError('Tollring API error: ' + err.message.slice(10));
+        return true;
+      }
+      showError('Could not reach the call data API. Check your Netlify environment variables and try again.');
+      return true;
     }
 
     async function getLiveCalls() {
@@ -1177,8 +1203,7 @@
         hideError();
         return data;
       } catch (e) {
-        debug('GetLiveCalls failed: ' + e.message);
-        if (e.message === 'AUTH_FAILED' || e.message === 'NOT_CONFIGURED') activateDemoMode();
+        handleApiFailure('GetLiveCalls', e);
         return lastKnownData.live;
       }
     }
@@ -1197,17 +1222,17 @@
         hideError();
         return Array.isArray(data) ? data : (data.Calls || data.calls || []);
       } catch (e) {
-        debug('GetCallsByDate failed: ' + e.message);
-        if (e.message === 'AUTH_FAILED' || e.message === 'NOT_CONFIGURED') activateDemoMode();
+        handleApiFailure('GetCallsByDate', e);
         return offsetDays === -1 ? lastKnownData.yesterday : lastKnownData.today;
       }
     }
 
-    function activateDemoMode() {
+    function activateDemoMode(reason) {
       if (isDemoMode) return;
       isDemoMode = true;
       enableDemoBadge();
-      showToast('Switched to demo mode - add Tollring env vars in Netlify to go live');
+      hideError();
+      showToast(reason || 'Running in demo mode');
       initDemoData();
     }
 
@@ -1816,14 +1841,9 @@
       fetchWeather();
 
       if (DEMO_MODE) {
-        isDemoMode = true;
-        initDemoData();
+        activateDemoMode('Demo mode is enabled in the dashboard config.');
       } else {
-        try {
-          await pollTodayData();
-        } catch (e) {
-          activateDemoMode();
-        }
+        await pollTodayData();
       }
 
       await pollLiveCalls();
