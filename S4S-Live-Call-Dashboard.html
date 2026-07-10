@@ -10,10 +10,10 @@
   <style>
     :root {
       --color-bg-base:       #080d14;
-      --color-bg-surface:    #0e1520;
-      --color-bg-elevated:   #141e2e;
-      --color-bg-border:     #1a2540;
-      --color-bg-subtle:     #0b1219;
+      --color-bg-surface:    #121c2b;
+      --color-bg-elevated:   #1a2739;
+      --color-bg-border:     #24324a;
+      --color-bg-subtle:     #0f1724;
       --color-bg-sidebar:    #060b11;
 
       --color-brand-primary: #0d77fe;
@@ -28,9 +28,9 @@
       --color-info:          #0d77fe;
       --color-info-dim:      #0d77fe18;
 
-      --color-text-primary:   #e8edf5;
-      --color-text-secondary: #8896b0;
-      --color-text-muted:     #4a5568;
+      --color-text-primary:   #f3f6fb;
+      --color-text-secondary: #c2cde0;
+      --color-text-muted:     #8b9bb5;
 
       --font-sans: 'Inter', -apple-system, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
@@ -75,6 +75,8 @@
       min-height: 100vh;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
+      font-size: 15px;
+      line-height: 1.55;
     }
 
     body.has-error-banner .main-content { padding-top: 44px; }
@@ -459,8 +461,9 @@
     .kpi-value.flash { animation: value-flash 0.4s ease; }
 
     .kpi-sub {
-      font-size: 13px;
-      color: var(--color-text-muted);
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      line-height: 1.45;
     }
     .kpi-sub.up   { color: var(--color-success); }
     .kpi-sub.down { color: var(--color-danger); }
@@ -513,12 +516,19 @@
       gap: var(--space-3);
     }
     .card-title {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 600;
       color: var(--color-text-primary);
       display: flex;
       align-items: center;
       gap: 8px;
+    }
+    .card-desc {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      margin-top: 4px;
+      line-height: 1.45;
+      max-width: 42ch;
     }
     .card-title svg { width: 16px; height: 16px; color: var(--color-brand-primary); opacity: 0.8; }
 
@@ -541,11 +551,11 @@
       border-collapse: collapse;
     }
     .ddi-table thead th {
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--color-text-muted);
+      color: var(--color-text-secondary);
       text-align: left;
       padding: 0 8px 12px;
       border-bottom: 1px solid var(--color-bg-border);
@@ -579,9 +589,9 @@
       color: var(--color-text-primary);
     }
     .ddi-number {
-      font-size: 13px;
+      font-size: 14px;
       font-family: var(--font-mono);
-      color: var(--color-text-muted);
+      color: var(--color-text-secondary);
       margin-top: 2px;
     }
     .ddi-count {
@@ -903,13 +913,13 @@
       border-collapse: collapse;
     }
     .recent-table thead th {
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--color-text-muted);
+      color: var(--color-text-secondary);
       text-align: left;
-      padding: 0 8px 10px;
+      padding: 0 10px 12px;
       border-bottom: 1px solid var(--color-bg-border);
     }
     .recent-table tbody tr {
@@ -918,12 +928,82 @@
     }
     .recent-table tbody tr:hover { background: var(--color-bg-elevated); }
     .recent-table tbody td {
-      padding: 12px 8px;
+      padding: 13px 10px;
+      font-size: 14px;
+      color: var(--color-text-primary);
+      font-family: var(--font-sans);
+      vertical-align: middle;
+    }
+    .recent-table tbody td.cell-mono {
+      font-family: var(--font-mono);
       font-size: 13px;
       color: var(--color-text-secondary);
-      font-family: var(--font-mono);
     }
-    .recent-table tbody td:last-child { font-family: var(--font-sans); }
+    .recent-table tbody td.cell-strong {
+      font-weight: 600;
+    }
+    .recent-table tbody td.cell-wait {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--color-danger);
+    }
+
+    .missed-panel .card-header { align-items: flex-start; }
+    .missed-summary {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+      padding: var(--space-4);
+      background: var(--color-bg-subtle);
+      border: 1px solid var(--color-bg-border);
+      border-radius: var(--radius-md);
+    }
+    .missed-stat-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin-bottom: 4px;
+    }
+    .missed-stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: var(--color-text-primary);
+    }
+    .missed-stat-value.up { color: var(--color-danger); }
+    .missed-stat-value.down { color: var(--color-success); }
+    .missed-stat-note {
+      display: block;
+      font-size: 11px;
+      color: var(--color-text-muted);
+      margin-top: 2px;
+    }
+    .missed-garage-breakdown {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: var(--space-4);
+    }
+    .missed-garage-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      background: var(--color-danger-dim);
+      border: 1px solid #ff475730;
+    }
+    .missed-garage-pill span {
+      font-family: var(--font-mono);
+      color: var(--color-danger);
+    }
     .dir-icon {
       display: inline-flex;
       align-items: center;
@@ -1069,6 +1149,7 @@
       .panel-left, .panel-centre, .panel-right { grid-column: 1; grid-row: auto; }
       .bottom-grid { grid-template-columns: 1fr; }
       .header { height: auto; padding: 16px; }
+      .missed-summary { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
@@ -1244,18 +1325,45 @@
                 <ul class="call-list" id="liveCallsList"></ul>
                 <button class="view-all-btn">View all live calls</button>
               </div>
-              <div class="card card-enter" style="animation-delay:540ms">
+              <div class="card card-enter missed-panel" id="missed-calls-panel" style="animation-delay:540ms">
                 <div class="card-header">
-                  <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Missed Calls Today</div>
+                  <div>
+                    <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Missed Calls Today</div>
+                    <p class="card-desc">Inbound unanswered calls only. Outbound calls are not included.</p>
+                  </div>
                   <span class="card-badge" id="missedPanelCount">0</span>
                 </div>
+                <div class="missed-summary">
+                  <div class="missed-stat">
+                    <span class="missed-stat-label">vs yesterday</span>
+                    <span class="missed-stat-value" id="missedVsYesterday">--</span>
+                    <span class="missed-stat-note" id="missedVsYesterdayNote">inbound missed</span>
+                  </div>
+                  <div class="missed-stat">
+                    <span class="missed-stat-label">Missed rate</span>
+                    <span class="missed-stat-value" id="missedSummaryRate">--</span>
+                    <span class="missed-stat-note">of inbound today</span>
+                  </div>
+                  <div class="missed-stat">
+                    <span class="missed-stat-label">Avg ring time</span>
+                    <span class="missed-stat-value" id="missedAvgRing">--</span>
+                    <span class="missed-stat-note">before hang-up</span>
+                  </div>
+                  <div class="missed-stat">
+                    <span class="missed-stat-label">Busiest line</span>
+                    <span class="missed-stat-value" id="missedBusiestGarage" style="font-size:15px;font-family:var(--font-sans)">--</span>
+                    <span class="missed-stat-note" id="missedBusiestCount">--</span>
+                  </div>
+                </div>
+                <div class="missed-garage-breakdown" id="missedByGarage"></div>
                 <table class="recent-table">
                   <thead>
                     <tr>
                       <th>Time</th>
                       <th>Garage</th>
+                      <th>Line</th>
                       <th>Caller</th>
-                      <th>Wait</th>
+                      <th>Rang for</th>
                     </tr>
                   </thead>
                   <tbody id="missedCallsBody"></tbody>
@@ -1298,7 +1406,8 @@
                 <div class="top-performer-sub" id="topPerformerSub">--</div>
               </div>
               <div class="card widget card-enter" id="missed-donut-panel" style="animation-delay:780ms">
-                <div class="card-title" style="margin-bottom:12px;justify-content:center;">Missed Calls</div>
+                <div class="card-title" style="margin-bottom:4px;justify-content:center;">Missed Inbound</div>
+                <p class="card-desc" style="text-align:center;margin:0 auto 12px;">Unanswered inbound only</p>
                 <div class="donut-wrap">
                   <svg class="donut-svg" id="donutMissed" viewBox="0 0 120 120"></svg>
                   <div class="donut-label" id="donutMissedLabel">Missed rate --</div>
@@ -1775,7 +1884,7 @@
       renderChart(true);
       renderLiveCalls([], true);
       renderRecentCalls([], true);
-      renderMissedCalls([], true);
+      renderMissedCalls([], [], true);
       renderDonutCompare(0, 0);
       renderDonutMissed(0, 0);
       document.getElementById('topPerformerName').textContent = '--';
@@ -2076,6 +2185,37 @@
       return call.Number || call.Caller_ID || '--';
     }
 
+    function formatPhoneDisplay(num) {
+      if (!num) return '--';
+      const raw = String(num).replace(/\s/g, '');
+      if (raw.startsWith('+44')) {
+        const n = '0' + raw.slice(3);
+        if (n.length === 11) return `${n.slice(0, 5)} ${n.slice(5, 8)} ${n.slice(8)}`;
+      }
+      const digits = raw.replace(/\D/g, '');
+      if (digits.length === 11 && digits.startsWith('0')) {
+        return `${digits.slice(0, 5)} ${digits.slice(5, 8)} ${digits.slice(8)}`;
+      }
+      if (digits.length === 10) {
+        return `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7)}`;
+      }
+      return num;
+    }
+
+    function getMissedCallsList(calls) {
+      return calls.filter(c => normaliseDirection(c) === 'IU');
+    }
+
+    function getMissedByGarage(calls) {
+      const counts = {};
+      getMissedCallsList(calls).forEach(c => {
+        const ddi = findDdiForCall(c);
+        const key = ddi ? ddi.name : 'Unknown';
+        counts[key] = (counts[key] || 0) + 1;
+      });
+      return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    }
+
     function updateLastUpdated() {
       const el = document.getElementById('lastUpdated');
       const now = new Date();
@@ -2136,7 +2276,7 @@
         `${t.answerRate}% answer rate`, ansPct >= 0 ? 'up' : 'down');
 
       setKpiValue('kpiMissedVal', t.missed, 'kpiMissedSub',
-        `${t.missedRate}% missed rate`, '');
+        `${t.missedRate}% of inbound (excl. outbound)`, '');
 
       const avgStr = formatTime(t.avgRing);
       const goalHtml = t.avgRing <= 20 ? ' <span class="goal-badge">Under 20s goal</span>' : '';
@@ -2291,27 +2431,76 @@
         else if (dir === 'OUT') { dirIcon = '\u2191'; dirClass = 'dir-out'; }
         else { dirIcon = '\u2193'; dirClass = 'dir-inc'; }
         return `<tr>
-          <td>${time}</td>
-          <td>${ddi ? ddi.name : 'Unknown'}</td>
-          <td>${dur}</td>
+          <td class="cell-mono">${time}</td>
+          <td class="cell-strong">${ddi ? ddi.name : 'Unknown'}</td>
+          <td class="cell-mono">${dur}</td>
           <td><span class="dir-icon ${dirClass}">${dirIcon}</span></td>
         </tr>`;
       }).join('');
     }
 
-    function renderMissedCalls(calls, force) {
+    function renderMissedCalls(calls, yesterdayCalls, force) {
       const missed = getMissedCalls(calls, 15);
-      const key = missed.map(c => callRecordKey(c)).join('|') || '0';
+      const allMissed = getMissedCallsList(calls);
+      const yMissed = getMissedCallsList(yesterdayCalls || []);
+      const key = missed.map(c => callRecordKey(c)).join('|') + '|' +
+        allMissed.length + '|' + yMissed.length;
       if (!force && key === uiSnapshots.missedKey) return;
       uiSnapshots.missedKey = key;
 
       const countEl = document.getElementById('missedPanelCount');
-      const totalMissed = calls.filter(c => normaliseDirection(c) === 'IU').length;
-      if (countEl) countEl.textContent = totalMissed;
+      if (countEl) countEl.textContent = allMissed.length;
+
+      const t = processCallsData(calls);
+      const y = processYesterdayCounts(yesterdayCalls || []);
+      const missedPct = pctChange(allMissed.length, yMissed.length);
+      const missedPctText = allMissed.length === 0 && yMissed.length === 0
+        ? '0'
+        : (missedPct > 0 ? `+${missedPct}%` : `${missedPct}%`);
+
+      const vsEl = document.getElementById('missedVsYesterday');
+      if (vsEl) {
+        vsEl.textContent = missedPctText;
+        vsEl.className = 'missed-stat-value' + (missedPct > 0 ? ' up' : missedPct < 0 ? ' down' : '');
+      }
+      const vsNote = document.getElementById('missedVsYesterdayNote');
+      if (vsNote) vsNote.textContent = `${allMissed.length} today vs ${yMissed.length} yesterday`;
+
+      const rateEl = document.getElementById('missedSummaryRate');
+      if (rateEl) rateEl.textContent = `${t.missedRate}%`;
+
+      const avgRingEl = document.getElementById('missedAvgRing');
+      if (avgRingEl) {
+        const ringTimes = allMissed.filter(c => c.Ring_time > 0).map(c => c.Ring_time);
+        const avgRing = ringTimes.length
+          ? ringTimes.reduce((a, b) => a + b, 0) / ringTimes.length
+          : 0;
+        avgRingEl.textContent = avgRing > 0 ? formatTime(Math.round(avgRing)) : '--';
+      }
+
+      const byGarage = getMissedByGarage(calls);
+      const busiestEl = document.getElementById('missedBusiestGarage');
+      const busiestCountEl = document.getElementById('missedBusiestCount');
+      if (byGarage.length) {
+        if (busiestEl) busiestEl.textContent = byGarage[0][0];
+        if (busiestCountEl) busiestCountEl.textContent = `${byGarage[0][1]} missed call${byGarage[0][1] === 1 ? '' : 's'}`;
+      } else {
+        if (busiestEl) busiestEl.textContent = '--';
+        if (busiestCountEl) busiestCountEl.textContent = 'No missed calls';
+      }
+
+      const breakdownEl = document.getElementById('missedByGarage');
+      if (breakdownEl) {
+        breakdownEl.innerHTML = byGarage.length
+          ? byGarage.map(([name, count]) =>
+              `<span class="missed-garage-pill">${name} <span>${count}</span></span>`
+            ).join('')
+          : '<span class="card-desc">No missed calls by garage yet today</span>';
+      }
 
       const tbody = document.getElementById('missedCallsBody');
       if (missed.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="empty-state" style="padding:20px;">No missed calls today</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state" style="padding:20px;">No missed inbound calls today</td></tr>';
         return;
       }
       tbody.innerHTML = missed.map(c => {
@@ -2319,11 +2508,14 @@
         const timeMatch = (c.Call_date || '').match(/(\d{2}:\d{2})/);
         const time = timeMatch ? timeMatch[1] : '--:--';
         const wait = c.Ring_time > 0 ? formatTime(c.Ring_time) : '0:00';
+        const line = ddi ? formatPhoneDisplay(ddi.number) : formatPhoneDisplay(c.DDIOrGroup);
+        const caller = formatPhoneDisplay(formatCallerId(c));
         return `<tr>
-          <td>${time}</td>
-          <td>${ddi ? ddi.name : 'Unknown'}</td>
-          <td>${formatCallerId(c)}</td>
-          <td>${wait}</td>
+          <td class="cell-mono">${time}</td>
+          <td class="cell-strong">${ddi ? ddi.name : 'Unknown'}</td>
+          <td class="cell-mono">${line}</td>
+          <td class="cell-mono">${caller}</td>
+          <td class="cell-wait">${wait}</td>
         </tr>`;
       }).join('');
     }
@@ -2551,7 +2743,7 @@
       const total = missed + answered;
       const rate = total > 0 ? Math.round((missed / total) * 100) : 0;
       renderDonut('donutMissed', missed, total || 1, String(missed), '#dc2626');
-      document.getElementById('donutMissedLabel').textContent = `${rate}% missed rate`;
+      document.getElementById('donutMissedLabel').textContent = `${rate}% of inbound missed`;
     }
 
     // ============================================================
@@ -2584,7 +2776,7 @@
       setChartData(today, yesterday);
       renderChart(force);
       renderRecentCalls(today, force);
-      renderMissedCalls(today, force);
+      renderMissedCalls(today, yesterday, force);
       renderTicker(force);
     }
 
