@@ -73,11 +73,14 @@
       background: var(--color-bg-base);
       color: var(--color-text-primary);
       min-height: 100vh;
+      min-height: 100dvh;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
       font-size: 15px;
       line-height: 1.55;
     }
+
+    img, svg, video { max-width: 100%; height: auto; }
 
     body.has-error-banner .main-content { padding-top: 44px; }
 
@@ -139,30 +142,17 @@
 
     /* Layout */
     .dashboard-layout {
-      display: grid;
-      grid-template-columns: 260px 1fr;
       min-height: 100vh;
     }
 
-    .sidebar {
-      background: var(--color-bg-sidebar);
-      border-right: 1px solid var(--color-bg-border);
+    .header-logo {
       display: flex;
       flex-direction: column;
-      padding: var(--space-6) 0;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      overflow-y: auto;
-    }
-
-    .sidebar-logo {
-      padding: 0 var(--space-6) var(--space-6);
-      border-bottom: 1px solid var(--color-bg-border);
-      margin-bottom: var(--space-4);
+      line-height: 1.1;
+      margin-right: var(--space-2);
     }
     .logo-s4s {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 800;
       color: var(--color-brand-primary);
       letter-spacing: -1px;
@@ -176,87 +166,6 @@
       text-transform: uppercase;
       color: var(--color-text-muted);
       margin-top: 4px;
-    }
-
-    .sidebar-nav {
-      flex: 1;
-      padding: var(--space-2) var(--space-3);
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      padding: 10px var(--space-4);
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--color-text-secondary);
-      border-left: 3px solid transparent;
-      transition: all var(--transition-fast);
-    }
-    .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; opacity: 0.7; }
-    .nav-item.active {
-      color: var(--color-text-primary);
-      background: var(--color-info-dim);
-      border-left-color: var(--color-brand-primary);
-    }
-    .nav-item .nav-badge {
-      margin-left: auto;
-      background: var(--color-success-dim);
-      color: var(--color-success);
-      border: 1px solid #00c48c40;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 10px;
-    }
-
-    .sidebar-brand-panel {
-      margin: var(--space-4) var(--space-4) var(--space-4);
-      padding: var(--space-4);
-      border-radius: var(--radius-md);
-      background: linear-gradient(135deg, #0d77fe18 0%, #ffd42610 100%);
-      border: 1px solid var(--color-bg-border);
-    }
-    .sidebar-brand-panel strong {
-      display: block;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      color: var(--color-brand-primary);
-      margin-bottom: 4px;
-    }
-    .sidebar-brand-panel p {
-      font-size: 11px;
-      color: var(--color-text-muted);
-      line-height: 1.5;
-    }
-
-    .sidebar-footer {
-      padding: var(--space-4) var(--space-6);
-      border-top: 1px solid var(--color-bg-border);
-      font-size: 11px;
-      color: var(--color-text-muted);
-    }
-    .sidebar-live {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 8px;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      color: var(--color-success);
-      text-transform: uppercase;
-    }
-    .sidebar-live-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--color-success);
-      animation: pulse 1.5s ease infinite;
     }
 
     .main-content {
@@ -467,6 +376,7 @@
       font-size: 14px;
       color: var(--color-text-secondary);
       line-height: 1.45;
+      word-break: break-word;
     }
     .kpi-sub.up   { color: var(--color-success); }
     .kpi-sub.down { color: var(--color-danger); }
@@ -474,7 +384,7 @@
     /* Panels grid */
     .panels-grid {
       display: grid;
-      grid-template-columns: minmax(280px, 0.85fr) minmax(0, 2fr) minmax(260px, 300px);
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
       grid-template-rows: auto;
       gap: var(--space-4);
       padding: 0 var(--space-5) var(--space-5);
@@ -484,21 +394,15 @@
       align-items: start;
     }
 
-    .panel-left {
+    .panel-main {
       grid-column: 1;
-      grid-row: 1;
-      position: sticky;
-      top: 0;
-    }
-    .panel-centre {
-      grid-column: 2;
       display: flex;
       flex-direction: column;
       gap: var(--space-4);
       min-width: 0;
     }
     .panel-right {
-      grid-column: 3;
+      grid-column: 2;
       grid-row: 1;
       position: sticky;
       top: 0;
@@ -507,7 +411,7 @@
     .main-grid { display: contents; }
     .bottom-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: var(--space-4);
       min-width: 0;
     }
@@ -574,6 +478,7 @@
       justify-content: space-between;
       margin-bottom: var(--space-4);
       gap: var(--space-3);
+      flex-wrap: wrap;
     }
     .card-title {
       font-size: 16px;
@@ -755,10 +660,15 @@
       border-radius: var(--radius-sm);
       cursor: pointer;
     }
+    .chart-period-note {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      margin-bottom: 8px;
+    }
     .chart-container {
       position: relative;
       width: 100%;
-      height: 220px;
+      height: 260px;
     }
     .chart-svg {
       width: 100%;
@@ -1188,45 +1098,208 @@
     @media (max-width: 1400px) {
       .kpi-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
-    @media (max-width: 1280px) {
-      .panels-grid {
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+
+    @media (max-width: 1100px) {
+      .main-content,
+      .dashboard {
+        overflow: visible;
+        min-height: auto;
       }
-      .panel-left  { grid-column: 1; position: static; }
-      .panel-centre { grid-column: 2; }
-      .panel-right  {
-        grid-column: 1 / -1;
-        position: static;
-      }
-      .right-col {
-        flex-direction: row;
-        flex-wrap: wrap;
-      }
-      .right-col .card {
-        flex: 1 1 220px;
-        min-width: 200px;
-      }
-    }
-    @media (max-width: 1024px) {
-      .dashboard-layout { grid-template-columns: 60px 1fr; }
-      .sidebar-logo .logo-sub, .nav-item span, .sidebar-brand-panel, .sidebar-footer { display: none; }
-      .sidebar-logo { padding: 0 12px 16px; text-align: center; }
-      .logo-s4s { font-size: 18px; }
-      .nav-item { justify-content: center; padding: 10px; }
-      .nav-item .nav-badge { display: none; }
       .panels-grid {
         grid-template-columns: 1fr;
+        overflow: visible;
       }
-      .panel-left, .panel-centre, .panel-right { grid-column: 1; }
-      .bottom-grid { grid-template-columns: 1fr; }
+      .panel-main,
+      .panel-right { grid-column: 1; }
+      .panel-right { position: static; }
+      .right-col {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--space-4);
+      }
     }
-    @media (max-width: 768px) {
-      .dashboard-layout { grid-template-columns: 1fr; }
-      .sidebar { display: none; }
+
+    @media (max-width: 900px) {
       .kpi-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .header { height: auto; padding: 16px; }
-      .missed-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .kpi-value { font-size: 30px; }
+      .right-col {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .right-col .card:last-child {
+        grid-column: 1 / -1;
+      }
+      .missed-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        height: auto;
+        padding: 14px 16px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+      }
+      .header-left {
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      .header-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .header-title { font-size: 20px; }
+      .header-subtitle { font-size: 12px; }
+      .logo-s4s { font-size: 22px; }
+
+      .kpi-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        padding: 12px 16px;
+        gap: 12px;
+      }
+      .kpi-value { font-size: 28px; }
+      .kpi-tile { padding: 14px 16px; }
+      .kpi-sub { font-size: 12px; }
+
+      .panels-grid {
+        padding: 0 16px 16px;
+        gap: 12px;
+      }
+      .setup-panel {
+        margin: 12px 16px 0;
+        padding: 16px;
+      }
+
+      .card {
+        padding: var(--space-4);
+      }
+      .card-title { font-size: 15px; }
+      .card-desc { max-width: none; }
+
+      #chart-panel .card-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .chart-select {
+        width: 100%;
+      }
+      .chart-container {
+        height: 200px;
+      }
+      .chart-legend {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 6px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+      }
+      .legend-toggle { flex-shrink: 0; }
+
+      .bottom-grid .card {
+        min-height: auto;
+      }
+      .bottom-grid .table-scroll {
+        max-height: none;
+      }
+
+      .missed-panel .card-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .missed-panel .card-badge {
+        align-self: flex-start;
+      }
+      .missed-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        padding: 12px;
+        gap: 10px;
+      }
+      .missed-stat-value { font-size: 16px; }
+
+      .right-col {
+        grid-template-columns: 1fr;
+      }
+      .right-col .card:last-child {
+        grid-column: auto;
+      }
+
+      .error-banner {
+        height: auto;
+        min-height: 44px;
+        padding: 8px 12px;
+        flex-wrap: wrap;
+        font-size: 12px;
+      }
+
+      .toast-container {
+        left: 16px;
+        right: 16px;
+        bottom: 52px;
+      }
+      .toast { max-width: none; }
+
+      .footer-ticker,
+      .activity-ticker {
+        height: auto;
+        min-height: 40px;
+        flex-wrap: wrap;
+      }
+      .ticker-label {
+        padding: 8px 12px;
+      }
+      .ticker-item { font-size: 11px; }
+
+      body.has-error-banner .main-content { padding-top: 56px; }
+    }
+
+    @media (max-width: 480px) {
+      .header-left {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .header-subtitle,
+      .logo-sub { display: none; }
+
+      .kpi-row {
+        grid-template-columns: 1fr;
+      }
+      .kpi-value { font-size: 32px; }
+
+      .missed-summary {
+        grid-template-columns: 1fr;
+      }
+      .missed-panel .table-scroll .recent-table {
+        min-width: 480px;
+      }
+      .table-scroll .recent-table {
+        min-width: 360px;
+      }
+
+      .top-performer-count { font-size: 28px; }
+      .top-performer-name { font-size: 18px; }
+
+      .setup-panel ol {
+        margin-left: 16px;
+        padding-right: 0;
+      }
+      .setup-btn {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .live-badge {
+        font-size: 10px;
+        padding: 3px 8px;
+      }
+      .last-updated {
+        font-size: 11px;
+      }
+      .kpi-label {
+        font-size: 10px;
+      }
     }
   </style>
 </head>
@@ -1242,31 +1315,15 @@
 
   <div class="dashboard-layout">
 
-    <aside class="sidebar">
-      <div class="sidebar-logo">
-        <div class="logo-s4s">s<span>4</span>s</div>
-        <div class="logo-sub">Service4Service</div>
-      </div>
-      <nav class="sidebar-nav">
-        <div class="nav-item active"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span>Overview</span></div>
-        <div class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>Numbers</span></div>
-        <div class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><span>Live Calls</span><span class="nav-badge" id="sidebarLiveBadge">0</span></div>
-      </nav>
-      <div class="sidebar-brand-panel">
-        <strong>EVERY CALL MATTERS</strong>
-        <p>Delivering exceptional service across the garage network.</p>
-      </div>
-      <div class="sidebar-footer">
-        <div>Service4Service Operations</div>
-        <div class="sidebar-live"><span class="sidebar-live-dot"></span> Live monitoring</div>
-      </div>
-    </aside>
-
     <main class="main-content">
       <div class="dashboard">
 
         <header class="header">
           <div class="header-left">
+            <div class="header-logo">
+              <div class="logo-s4s">s<span>4</span>s</div>
+              <div class="logo-sub">Service4Service</div>
+            </div>
             <div>
               <div class="header-title">Live Call Dashboard</div>
               <div class="header-subtitle">Real-time performance across the garage network</div>
@@ -1355,31 +1412,7 @@
         </div>
 
         <div class="panels-grid">
-          <div class="panel-left">
-            <div class="card card-enter" id="numbers-panel" style="animation-delay:360ms">
-              <div class="card-header">
-                <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Calls Today by Number</div>
-              </div>
-              <div class="table-scroll">
-              <table class="ddi-table">
-                <thead>
-                  <tr>
-                    <th></th>
-                    <th>Name</th>
-                    <th>Number</th>
-                    <th>Count</th>
-                    <th>vs Yest.</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody id="ddiTableBody"></tbody>
-              </table>
-              </div>
-              <button class="view-all-btn">View all numbers</button>
-            </div>
-          </div>
-
-          <div class="panel-centre">
+          <div class="panel-main">
             <div class="card card-enter" id="chart-panel" style="animation-delay:420ms">
               <div class="card-header">
                 <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Call Volume</div>
@@ -1389,6 +1422,7 @@
                   <option value="month">This Month</option>
                 </select>
               </div>
+              <div class="chart-period-note" id="chartPeriodNote">Hourly volume · today vs yesterday</div>
               <div class="chart-container" id="chartContainer">
                 <svg class="chart-svg" id="chartSvg" viewBox="0 0 600 220" preserveAspectRatio="xMidYMid meet"></svg>
                 <div class="chart-tooltip" id="chartTooltip"></div>
@@ -1397,13 +1431,6 @@
             </div>
 
             <div class="bottom-grid">
-              <div class="card card-enter" id="live-calls-panel" style="animation-delay:480ms">
-                <div class="card-header">
-                  <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Live Calls</div>
-                </div>
-                <ul class="call-list" id="liveCallsList"></ul>
-                <button class="view-all-btn">View all live calls</button>
-              </div>
               <div class="card card-enter" id="recent-calls-panel" style="animation-delay:600ms">
                 <div class="card-header">
                   <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Recent Calls</div>
@@ -1509,6 +1536,12 @@
         </div>
       </footer>
     </main>
+
+    <!-- Hidden anchors for live polling scripts -->
+    <div hidden aria-hidden="true">
+      <table><tbody id="ddiTableBody"></tbody></table>
+      <ul id="liveCallsList"></ul>
+    </div>
   </div>
 
 <script>
@@ -1542,18 +1575,22 @@
     let isDemoMode = DEMO_MODE;
     let todayCalls = [];
     let yesterdayCalls = [];
+    let fortnightCalls = [];
     let liveCalls = [];
     let ddiStatuses = {};
     let tickerEvents = [];
     let prevKpiValues = {};
-    let lastKnownData = { today: [], yesterday: [], live: [] };
+    let lastKnownData = { today: [], yesterday: [], live: [], fortnight: [] };
     let demoInterval = null;
     let liveTimerInterval = null;
     let isPolling = false;
     let pollIntervalId = null;
     let hasConnectedOnce = false;
     const POLL_INTERVAL_MS = 30000;
+    const FORTNIGHT_TTL_MS = 5 * 60 * 1000;
+    let lastFortnightFetchAt = 0;
     let chartDataCache = null;
+    let chartPeriod = 'today';
     const chartSelectedDdis = new Set();
 
     const uiSnapshots = {
@@ -1631,6 +1668,63 @@
     function getDateRange(offsetDays) {
       const ds = getLondonDateString(offsetDays || 0);
       return { StartDate: `${ds} 00:00:00`, EndDate: `${ds} 23:59:59` };
+    }
+
+    function getSpanDateRange(startOffset, endOffset) {
+      const start = getLondonDateString(startOffset);
+      const end = getLondonDateString(endOffset);
+      return { StartDate: `${start} 00:00:00`, EndDate: `${end} 23:59:59` };
+    }
+
+    function buildDayLabels(endOffset, count) {
+      const labels = [];
+      const startOffset = endOffset - (count - 1);
+      for (let i = 0; i < count; i++) {
+        labels.push(getLondonDateString(startOffset + i));
+      }
+      return labels;
+    }
+
+    function getCallDate(callDate) {
+      if (!callDate) return null;
+      const m = String(callDate).match(/^(\d{4}-\d{2}-\d{2})/);
+      return m ? m[1] : null;
+    }
+
+    function formatDayLabel(dateStr) {
+      if (!dateStr) return '--';
+      const parts = dateStr.split('-');
+      const dt = new Date(Date.UTC(+parts[0], +parts[1] - 1, +parts[2], 12, 0, 0));
+      const weekday = dt.toLocaleDateString('en-GB', { weekday: 'short', timeZone: 'Europe/London' });
+      return `${weekday} ${parts[2]}/${parts[1]}`;
+    }
+
+    function filterCallsInLabels(calls, labels) {
+      const allowed = new Set(labels);
+      return calls.filter(c => allowed.has(getCallDate(c.Call_date)));
+    }
+
+    function bucketByDay(calls, dayLabels) {
+      const buckets = new Array(dayLabels.length).fill(0);
+      calls.forEach(c => {
+        const d = getCallDate(c.Call_date);
+        const idx = dayLabels.indexOf(d);
+        if (idx >= 0) buckets[idx]++;
+      });
+      return buckets;
+    }
+
+    function bucketByDayPerDdi(calls, dayLabels) {
+      const buckets = {};
+      DDI_LIST.forEach(d => { buckets[d.ddi] = new Array(dayLabels.length).fill(0); });
+      calls.forEach(c => {
+        const ddi = findDdiForCall(c);
+        if (!ddi) return;
+        const d = getCallDate(c.Call_date);
+        const idx = dayLabels.indexOf(d);
+        if (idx >= 0) buckets[ddi.ddi][idx]++;
+      });
+      return buckets;
     }
 
     function formatTime(seconds) {
@@ -1948,6 +2042,33 @@
       }
     }
 
+    async function getCallsForSpan(startOffset, endOffset) {
+      if (isDemoMode) return demoFortnightCalls;
+      const range = getSpanDateRange(startOffset, endOffset);
+      const body = { ...range, Directions: 'INC,IU,OUT' };
+      try {
+        const data = await queuedFetch('GetCallsByDate', 'POST', body);
+        lastKnownData.fortnight = data;
+        hideError();
+        hideSetupPanel();
+        return tollringRecords(data);
+      } catch (e) {
+        handleApiFailure('GetCallsByDate span', e);
+        return tollringRecords(lastKnownData.fortnight);
+      }
+    }
+
+    async function getFortnightCalls(force) {
+      if (isDemoMode) return demoFortnightCalls;
+      if (!force && Date.now() - lastFortnightFetchAt < FORTNIGHT_TTL_MS && fortnightCalls.length) {
+        return fortnightCalls;
+      }
+      const data = await getCallsForSpan(-13, 0);
+      fortnightCalls = Array.isArray(data) ? data : [];
+      lastFortnightFetchAt = Date.now();
+      return fortnightCalls;
+    }
+
     function activateDemoMode(reason) {
       if (isDemoMode) return;
       isDemoMode = true;
@@ -1964,7 +2085,7 @@
       updateStatsKpis([], [], true);
       updateLiveKpi(0, true);
       updateDdiTableCounts({}, {}, true);
-      setChartData([], []);
+      refreshChartCache([], [], []);
       renderChart(true);
       renderLiveCalls([], true);
       renderRecentCalls([], true);
@@ -1989,6 +2110,7 @@
     // ============================================================
     let demoTodayCalls = [];
     let demoYesterdayCalls = [];
+    let demoFortnightCalls = [];
     let demoLiveCalls = [];
     function bellCurveHourly(baseMax) {
       const hours = [];
@@ -2057,6 +2179,28 @@
       });
 
       demoLiveCalls = generateDemoLiveCalls();
+      demoFortnightCalls = [...demoTodayCalls, ...demoYesterdayCalls];
+      for (let dayOffset = -13; dayOffset <= -2; dayOffset++) {
+        const dateStr = getLondonDateString(dayOffset);
+        const dayCount = 70 + Math.floor(Math.random() * 50);
+        const weights = bellCurveHourly(10);
+        const weightSum = weights.reduce((a, b) => a + b, 0) || 1;
+        for (let i = 0; i < dayCount; i++) {
+          const ddi = DDI_LIST[Math.floor(Math.random() * DDI_LIST.length)];
+          const hour = pickWeightedHour(weights, weightSum);
+          const dir = Math.random() < 0.14 ? 'IU' : (Math.random() < 0.1 ? 'OUT' : 'INC');
+          demoFortnightCalls.push({
+            Direction: dir,
+            Port: ddi.number,
+            DDIOrGroup: ddi.ddi,
+            Caller_ID: '07' + String(Math.floor(Math.random() * 900000000 + 100000000)),
+            Call_date: `${dateStr} ${String(hour).padStart(2,'0')}:${String(Math.floor(Math.random()*60)).padStart(2,'0')}:00`,
+            Ring_time: Math.floor(Math.random() * 35) + 5,
+            Talk_time: dir === 'IU' ? 0 : Math.floor(Math.random() * 280) + 20,
+            Duration: Math.floor(Math.random() * 340) + 15
+          });
+        }
+      }
       if (demoInterval) clearInterval(demoInterval);
       demoInterval = setInterval(simulateDemoTick, 20000 + Math.random() * 10000);
     }
@@ -2649,10 +2793,10 @@
     // ============================================================
     function renderChart(force) {
       if (!chartDataCache) return;
-      const { todayTotal, yesterdayTotal, todayByDdi, yesterdayByDdi } = chartDataCache;
+      const { todayTotal, yesterdayTotal, todayByDdi, yesterdayByDdi, mode, pointCount, dayLabels } = chartDataCache;
       const selectionKey = [...chartSelectedDdis].sort().join(',');
       const dataKey = todayTotal.join(',') + '|' + yesterdayTotal.join(',') + '|' +
-        DDI_LIST.map(d => (todayByDdi[d.ddi] || []).join(',')).join('|');
+        DDI_LIST.map(d => (todayByDdi[d.ddi] || []).join(',')).join('|') + '|' + mode;
       const fullKey = dataKey + '::' + selectionKey;
       if (!force && fullKey === uiSnapshots.chartKey) return;
       uiSnapshots.chartKey = fullKey;
@@ -2665,8 +2809,8 @@
         visibleSeries.push({
           name: ddi.name,
           colour: AVATAR_COLOURS[idx % AVATAR_COLOURS.length],
-          today: todayByDdi[ddi.ddi] || new Array(24).fill(0),
-          yesterday: yesterdayByDdi[ddi.ddi] || new Array(24).fill(0)
+          today: todayByDdi[ddi.ddi] || new Array(pointCount).fill(0),
+          yesterday: yesterdayByDdi[ddi.ddi] || new Array(pointCount).fill(0)
         });
       });
 
@@ -2679,15 +2823,16 @@
       const maxVal = Math.max(peak, 1);
 
       const svg = document.getElementById('chartSvg');
-      const W = 600, H = 220, padL = 44, padR = 16, padT = 20, padB = 32;
+      const W = 600, H = 220, padL = 44, padR = 16, padT = 28, padB = 32;
       const chartW = W - padL - padR;
       const chartH = H - padT - padB;
+      const xDivisor = Math.max(pointCount - 1, 1);
 
       function toPoints(data) {
         return data.map((v, i) => {
-          const x = padL + (i / 23) * chartW;
+          const x = padL + (i / xDivisor) * chartW;
           const y = padT + chartH - (v / maxVal) * chartH;
-          return { x, y, v, hour: i };
+          return { x, y, v, index: i };
         });
       }
 
@@ -2700,7 +2845,6 @@
         return linePath(pts) + ` L${pts[pts.length - 1].x.toFixed(1)},${bottom} L${pts[0].x.toFixed(1)},${bottom} Z`;
       }
 
-      const hourLabels = [0, 4, 8, 12, 16, 20];
       const yTicks = peak > 0 ? [0, Math.ceil(peak / 2), peak] : [0, 1, 2];
       const uniqueYTicks = [...new Set(yTicks)];
 
@@ -2717,11 +2861,19 @@
         html += `<text x="${padL - 6}" y="${y + 3}" fill="#64748b" font-size="9" text-anchor="end" font-family="Inter,sans-serif">${val}</text>`;
       });
 
-      hourLabels.forEach(h => {
-        const x = padL + (h / 23) * chartW;
-        html += `<text x="${x}" y="${H - 8}" fill="#64748b" font-size="9" text-anchor="middle" font-family="Inter,sans-serif">${String(h).padStart(2,'0')}:00</text>`;
-      });
-      html += `<text x="${padL + chartW}" y="${H - 8}" fill="#64748b" font-size="9" text-anchor="middle" font-family="Inter,sans-serif">24:00</text>`;
+      if (mode === 'week') {
+        dayLabels.forEach((label, i) => {
+          const x = padL + (i / xDivisor) * chartW;
+          const text = formatDayLabel(label);
+          html += `<text x="${x}" y="${H - 8}" fill="#64748b" font-size="8" text-anchor="middle" font-family="Inter,sans-serif">${text}</text>`;
+        });
+      } else {
+        [0, 4, 8, 12, 16, 20].forEach(h => {
+          const x = padL + (h / xDivisor) * chartW;
+          html += `<text x="${x}" y="${H - 8}" fill="#64748b" font-size="9" text-anchor="middle" font-family="Inter,sans-serif">${String(h).padStart(2,'0')}:00</text>`;
+        });
+        html += `<text x="${padL + chartW}" y="${H - 8}" fill="#64748b" font-size="9" text-anchor="middle" font-family="Inter,sans-serif">24:00</text>`;
+      }
 
       visibleSeries.forEach(s => {
         html += `<path d="${linePath(toPoints(s.yesterday))}" fill="none" stroke="${s.colour}" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.45" pointer-events="none"/>`;
@@ -2742,28 +2894,37 @@
       html += `<path d="${linePath(totalPts)}" fill="none" stroke="#0d77fe" stroke-width="2.5" stroke-linejoin="round"/>`;
       totalPts.forEach(p => {
         if (p.v > 0) html += `<circle cx="${p.x}" cy="${p.y}" r="3" fill="#0d77fe" stroke="#fff" stroke-width="1.5"/>`;
-        html += `<circle cx="${p.x}" cy="${p.y}" r="14" fill="transparent" class="chart-hit" data-hour="${p.hour}" data-today="${p.v}" data-yest="${yesterdayTotal[p.hour]}" style="cursor:pointer"/>`;
+        html += `<circle cx="${p.x}" cy="${p.y}" r="14" fill="transparent" class="chart-hit" data-index="${p.index}" data-today="${p.v}" data-yest="${yesterdayTotal[p.index]}" style="cursor:pointer"/>`;
       });
 
       svg.innerHTML = html;
-      renderChartLegend(todayByDdi);
+      renderChartLegend(todayByDdi, mode);
 
       svg.querySelectorAll('.chart-hit').forEach(circle => {
         circle.addEventListener('mouseenter', e => {
-          const hour = parseInt(circle.dataset.hour, 10);
+          const idx = parseInt(circle.dataset.index, 10);
           const tooltip = document.getElementById('chartTooltip');
-          const hourLabel = `${String(hour).padStart(2,'0')}:00 – ${String(hour).padStart(2,'0')}:59`;
+          let title;
+          if (mode === 'week') {
+            const label = dayLabels[idx];
+            title = formatDayLabel(label);
+            if (label === getLondonDateString(0)) title += ' (today)';
+          } else {
+            title = `${String(idx).padStart(2,'0')}:00 – ${String(idx).padStart(2,'0')}:59`;
+          }
           const todayCount = circle.dataset.today;
           const yestCount = circle.dataset.yest;
-          let html = `<strong>${hourLabel}</strong><br>Today: ${todayCount} calls<br>Yesterday: ${yestCount} calls`;
+          const periodLabel = mode === 'week' ? 'This week' : 'Today';
+          const compareLabel = mode === 'week' ? 'Last week' : 'Yesterday';
+          let tipHtml = `<strong>${title}</strong><br>${periodLabel}: ${todayCount} calls<br>${compareLabel}: ${yestCount} calls`;
           visibleSeries.forEach(s => {
-            const t = s.today[hour];
-            const y = s.yesterday[hour];
+            const t = s.today[idx];
+            const y = s.yesterday[idx];
             if (t > 0 || y > 0) {
-              html += `<br><span style="color:${s.colour};font-weight:600">${s.name}</span>: ${t} today · ${y} yest`;
+              tipHtml += `<br><span style="color:${s.colour};font-weight:600">${s.name}</span>: ${t} ${mode === 'week' ? 'this wk' : 'today'} · ${y} ${mode === 'week' ? 'last wk' : 'yest'}`;
             }
           });
-          tooltip.innerHTML = html;
+          tooltip.innerHTML = tipHtml;
           tooltip.classList.add('visible');
           const rect = document.getElementById('chartContainer').getBoundingClientRect();
           tooltip.style.left = (e.clientX - rect.left - 40) + 'px';
@@ -2773,31 +2934,75 @@
           document.getElementById('chartTooltip').classList.remove('visible');
         });
       });
+
+      updateChartPeriodNote();
     }
 
-    function renderChartLegend(todayByDdi) {
+    function renderChartLegend(todayByDdi, mode) {
       const legend = document.getElementById('chartLegend');
+      const totalLabel = mode === 'week' ? 'Total (7 days)' : 'Total';
       let html = `<button type="button" class="legend-toggle active locked" data-ddi="__total__" title="Always shown">
-        <span class="legend-line total"></span>Total</button>`;
+        <span class="legend-line total"></span>${totalLabel}</button>`;
       DDI_LIST.forEach((ddi, idx) => {
         const colour = AVATAR_COLOURS[idx % AVATAR_COLOURS.length];
         const active = chartSelectedDdis.has(ddi.ddi);
-        const count = (todayByDdi[ddi.ddi] || []).reduce((a, b) => a + b, 0);
+        const series = todayByDdi[ddi.ddi] || [];
+        const count = series.reduce((a, b) => a + b, 0);
         html += `<button type="button" class="legend-toggle${active ? ' active' : ''}" data-ddi="${ddi.ddi}">
           <span class="legend-line" style="background:${colour}"></span>${ddi.name} (${count})</button>`;
       });
       legend.innerHTML = html;
     }
 
-    function setChartData(today, yesterday) {
+    function refreshChartCache(today, yesterday, fortnight) {
+      if (chartPeriod === 'week') {
+        const thisWeekLabels = buildDayLabels(0, 7);
+        const prevWeekLabels = buildDayLabels(-7, 7);
+        const thisWeekCalls = filterCallsInLabels(fortnight || [], thisWeekLabels);
+        const prevWeekCalls = filterCallsInLabels(fortnight || [], prevWeekLabels);
+        const todayTotal = bucketByDay(thisWeekCalls, thisWeekLabels);
+        const yesterdayTotal = bucketByDay(prevWeekCalls, prevWeekLabels);
+        chartDataCache = {
+          mode: 'week',
+          pointCount: 7,
+          todayTotal,
+          yesterdayTotal,
+          todayByDdi: bucketByDayPerDdi(thisWeekCalls, thisWeekLabels),
+          yesterdayByDdi: bucketByDayPerDdi(prevWeekCalls, prevWeekLabels),
+          dayLabels: thisWeekLabels,
+          weekTotal: todayTotal.reduce((a, b) => a + b, 0),
+          prevWeekTotal: yesterdayTotal.reduce((a, b) => a + b, 0)
+        };
+        return;
+      }
+
       const t = processCallsData(today);
       const y = processYesterdayCounts(yesterday);
       chartDataCache = {
+        mode: 'today',
+        pointCount: 24,
         todayTotal: t.hourlyToday,
         yesterdayTotal: y.hourly,
         todayByDdi: t.hourlyByDdi,
-        yesterdayByDdi: y.hourlyByDdi
+        yesterdayByDdi: y.hourlyByDdi,
+        dayLabels: [],
+        weekTotal: 0,
+        prevWeekTotal: 0
       };
+    }
+
+    function updateChartPeriodNote() {
+      const el = document.getElementById('chartPeriodNote');
+      if (!el || !chartDataCache) return;
+      if (chartPeriod === 'week') {
+        const total = chartDataCache.weekTotal || 0;
+        const prev = chartDataCache.prevWeekTotal || 0;
+        const pct = pctChange(total, prev);
+        const sign = pct > 0 ? '+' : '';
+        el.textContent = `${total} calls this week · ${prev} last week (${sign}${pct}%)`;
+      } else {
+        el.textContent = 'Hourly volume · today vs yesterday';
+      }
     }
 
     // ============================================================
@@ -2858,7 +3063,7 @@
       const y = processYesterdayCounts(yesterday);
       updateStatsKpis(today, yesterday, force);
       updateDdiTableCounts(t.ddiCounts, y.ddiCounts, force);
-      setChartData(today, yesterday);
+      refreshChartCache(today, yesterday, fortnightCalls);
       renderChart(force);
       renderRecentCalls(today, force);
       renderMissedCalls(today, yesterday, force);
@@ -2872,6 +3077,7 @@
         if (isDemoMode) {
           todayCalls = demoTodayCalls;
           yesterdayCalls = demoYesterdayCalls;
+          fortnightCalls = demoFortnightCalls;
           liveCalls = tollringRecords(demoGetLiveCalls());
           updateDdiStatuses(liveCalls);
           if (renderLiveCalls(liveCalls, force)) startLiveTimers();
@@ -2911,6 +3117,8 @@
           uiSnapshots.yesterdayKey = fingerprintCalls(nextYesterday);
         }
 
+        fortnightCalls = await getFortnightCalls(false);
+
         refreshHistoricalUi(force);
         updateLastUpdated();
       } finally {
@@ -2921,11 +3129,27 @@
     // ============================================================
     // CHART SELECT
     // ============================================================
-    document.getElementById('chartSelect').addEventListener('change', function() {
-      if (this.value !== 'today') {
-        showToast('Coming soon - only Today view is available');
-        this.value = 'today';
+    document.getElementById('chartSelect').addEventListener('change', async function() {
+      const val = this.value;
+      if (val === 'month') {
+        showToast('Monthly view coming soon');
+        this.value = chartPeriod;
+        return;
       }
+      if (val === chartPeriod) return;
+
+      chartPeriod = val;
+      if (chartPeriod === 'week' && !fortnightCalls.length && !isDemoMode) {
+        showToast('Loading past week data...');
+        fortnightCalls = await getFortnightCalls(true);
+      }
+
+      refreshChartCache(
+        isDemoMode ? demoTodayCalls : todayCalls,
+        isDemoMode ? demoYesterdayCalls : yesterdayCalls,
+        isDemoMode ? demoFortnightCalls : fortnightCalls
+      );
+      renderChart(true);
     });
 
     document.getElementById('chartLegend').addEventListener('click', e => {
