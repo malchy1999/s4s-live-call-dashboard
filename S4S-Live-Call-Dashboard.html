@@ -384,7 +384,7 @@
     /* Panels grid */
     .panels-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+      grid-template-columns: minmax(240px, 0.85fr) minmax(0, 2fr) minmax(260px, 300px);
       grid-template-rows: auto;
       gap: var(--space-4);
       padding: 0 var(--space-5) var(--space-5);
@@ -394,18 +394,26 @@
       align-items: start;
     }
 
-    .panel-main {
+    .panel-left {
       grid-column: 1;
+      grid-row: 1;
+      position: sticky;
+      top: 0;
+      min-width: 0;
+    }
+    .panel-main {
+      grid-column: 2;
       display: flex;
       flex-direction: column;
       gap: var(--space-4);
       min-width: 0;
     }
     .panel-right {
-      grid-column: 2;
+      grid-column: 3;
       grid-row: 1;
       position: sticky;
       top: 0;
+      min-width: 0;
     }
 
     .main-grid { display: contents; }
@@ -448,7 +456,7 @@
       min-width: 520px;
     }
     #numbers-panel .table-scroll .ddi-table {
-      min-width: 100%;
+      min-width: 480px;
     }
     #numbers-panel .table-scroll {
       max-height: calc(100vh - 220px);
@@ -1099,6 +1107,14 @@
       .kpi-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
 
+    @media (max-width: 1280px) {
+      .panels-grid {
+        grid-template-columns: minmax(220px, 0.75fr) minmax(0, 1.6fr) minmax(220px, 260px);
+      }
+      .panel-left,
+      .panel-right { position: static; }
+    }
+
     @media (max-width: 1100px) {
       .main-content,
       .dashboard {
@@ -1109,9 +1125,9 @@
         grid-template-columns: 1fr;
         overflow: visible;
       }
+      .panel-left,
       .panel-main,
-      .panel-right { grid-column: 1; }
-      .panel-right { position: static; }
+      .panel-right { grid-column: 1; position: static; }
       .right-col {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1412,6 +1428,29 @@
         </div>
 
         <div class="panels-grid">
+          <div class="panel-left">
+            <div class="card card-enter" id="numbers-panel" style="animation-delay:360ms">
+              <div class="card-header">
+                <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Calls Today by Number</div>
+              </div>
+              <div class="table-scroll">
+                <table class="ddi-table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Name</th>
+                      <th>Number</th>
+                      <th>Count</th>
+                      <th>vs Yest.</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ddiTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
           <div class="panel-main">
             <div class="card card-enter" id="chart-panel" style="animation-delay:420ms">
               <div class="card-header">
@@ -1537,9 +1576,8 @@
       </footer>
     </main>
 
-    <!-- Hidden anchors for live polling scripts -->
+    <!-- Hidden anchor for live call polling -->
     <div hidden aria-hidden="true">
-      <table><tbody id="ddiTableBody"></tbody></table>
       <ul id="liveCallsList"></ul>
     </div>
   </div>
