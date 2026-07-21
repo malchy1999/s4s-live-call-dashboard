@@ -742,6 +742,11 @@
       display: inline-block;
     }
     .legend-line.total { background: var(--color-brand-primary); }
+    .legend-line.last-week {
+      background: transparent;
+      height: 0;
+      border-top: 2px dashed #94a3b8;
+    }
 
     /* Donuts & widgets */
     .widget { text-align: center; }
@@ -1677,6 +1682,19 @@
       return next.filter(c => !ids.has(c.RecordId || c.CallId || callRecordKey(c)));
     }
 
+    function mergeCallRecords(...sources) {
+      const seen = new Set();
+      const out = [];
+      sources.flat().filter(Boolean).forEach(c => {
+        if (!c) return;
+        const key = callRecordKey(c);
+        if (seen.has(key)) return;
+        seen.add(key);
+        out.push(c);
+      });
+      return out;
+    }
+
     // ============================================================
     // UTILITIES
     // ============================================================
@@ -1697,10 +1715,12 @@
     }
 
     function getLondonDateString(offsetDays) {
-      const d = new Date();
-      d.setDate(d.getDate() + (offsetDays || 0));
-      const p = getLondonParts(d);
-      return `${p.year}-${p.month}-${p.day}`;
+      const now = new Date();
+      const p = getLondonParts(now);
+      const utcNoon = Date.UTC(+p.year, +p.month - 1, +p.day, 12, 0, 0);
+      const shifted = new Date(utcNoon + (offsetDays || 0) * 86400000);
+      const sp = getLondonParts(shifted);
+      return `${sp.year}-${sp.month}-${sp.day}`;
     }
 
     function getDateRange(offsetDays) {
@@ -1723,10 +1743,20 @@
       return labels;
     }
 
+    function getCallDateField(call) {
+      return call.Call_date || call.CallDate || call.call_date || '';
+    }
+
     function getCallDate(callDate) {
       if (!callDate) return null;
-      const m = String(callDate).match(/^(\d{4}-\d{2}-\d{2})/);
-      return m ? m[1] : null;
+      const str = String(callDate).trim();
+      let m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+      m = str.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+      if (m) return `${m[3]}-${m[2]}-${m[1]}`;
+      m = str.match(/^(\d{4})\/(\d{2})\/(\d{2})/);
+      if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+      return null;
     }
 
     function formatDayLabel(dateStr) {
@@ -1739,13 +1769,13 @@
 
     function filterCallsInLabels(calls, labels) {
       const allowed = new Set(labels);
-      return calls.filter(c => allowed.has(getCallDate(c.Call_date)));
+      return calls.filter(c => allowed.has(getCallDate(getCallDateField(c))));
     }
 
     function bucketByDay(calls, dayLabels) {
       const buckets = new Array(dayLabels.length).fill(0);
       calls.forEach(c => {
-        const d = getCallDate(c.Call_date);
+        const d = getCallDate(getCallDateField(c));
         const idx = dayLabels.indexOf(d);
         if (idx >= 0) buckets[idx]++;
       });
@@ -1758,7 +1788,7 @@
       calls.forEach(c => {
         const ddi = findDdiForCall(c);
         if (!ddi) return;
-        const d = getCallDate(c.Call_date);
+        const d = getCallDate(getCallDateField(c));
         const idx = dayLabels.indexOf(d);
         if (idx >= 0) buckets[ddi.ddi][idx]++;
       });
@@ -1988,7 +2018,15 @@
     }
 
     function tollringRecords(data) {
-      return Array.isArray(data) ? data : (data.Data || data.Calls || data.calls || []);
+      if (Array.isArray(data)) return data;
+      if (!data || typeof data !== 'object') return [];
+      const direct = data.Data ?? data.Calls ?? data.calls;
+      if (Array.isArray(direct)) return direct;
+      if (direct && typeof direct === 'object') {
+        if (Array.isArray(direct.Calls)) return direct.Calls;
+        if (Array.isArray(direct.calls)) return direct.calls;
+      }
+      return [];
     }
 
     function queuedFetch(endpoint, method, body) {
@@ -2098,12 +2136,23 @@
 
     async function getFortnightCalls(force) {
       if (isDemoMode) return demoFortnightCalls;
+
+      const mergeFresh = () => mergeCallRecords(fortnightCalls, todayCalls, yesterdayCalls);
+
       if (!force && Date.now() - lastFortnightFetchAt < FORTNIGHT_TTL_MS && fortnightCalls.length) {
-        return fortnightCalls;
+        return mergeFresh();
       }
-      const data = await getCallsForSpan(-13, 0);
-      fortnightCalls = Array.isArray(data) ? data : [];
+
+      let spanCalls = await getCallsForSpan(-13, 0);
+      if (spanCalls.length < 20) {
+        const older = await getCallsForSpan(-13, -7);
+        const recent = await getCallsForSpan(-6, 0);
+        spanCalls = mergeCallRecords(spanCalls, older, recent);
+      }
+
+      fortnightCalls = mergeCallRecords(spanCalls, todayCalls, yesterdayCalls);
       lastFortnightFetchAt = Date.now();
+      debug('Fortnight calls loaded: ' + fortnightCalls.length);
       return fortnightCalls;
     }
 
@@ -2831,7 +2880,7 @@
     // ============================================================
     function renderChart(force) {
       if (!chartDataCache) return;
-      const { todayTotal, yesterdayTotal, todayByDdi, yesterdayByDdi, mode, pointCount, dayLabels } = chartDataCache;
+      const { todayTotal, yesterdayTotal, todayByDdi, yesterdayByDdi, mode, pointCount, dayLabels, prevWeekLabels } = chartDataCache;
       const selectionKey = [...chartSelectedDdis].sort().join(',');
       const dataKey = todayTotal.join(',') + '|' + yesterdayTotal.join(',') + '|' +
         DDI_LIST.map(d => (todayByDdi[d.ddi] || []).join(',')).join('|') + '|' + mode;
@@ -2945,7 +2994,10 @@
           let title;
           if (mode === 'week') {
             const label = dayLabels[idx];
-            title = formatDayLabel(label);
+            const prevLabel = prevWeekLabels?.[idx];
+            title = prevLabel
+              ? `${formatDayLabel(label)} vs ${formatDayLabel(prevLabel)}`
+              : formatDayLabel(label);
             if (label === getLondonDateString(0)) title += ' (today)';
           } else {
             title = `${String(idx).padStart(2,'0')}:00 – ${String(idx).padStart(2,'0')}:59`;
@@ -2978,9 +3030,16 @@
 
     function renderChartLegend(todayByDdi, mode) {
       const legend = document.getElementById('chartLegend');
-      const totalLabel = mode === 'week' ? 'Total (7 days)' : 'Total';
-      let html = `<button type="button" class="legend-toggle active locked" data-ddi="__total__" title="Always shown">
-        <span class="legend-line total"></span>${totalLabel}</button>`;
+      let html = '';
+      if (mode === 'week') {
+        html += `<button type="button" class="legend-toggle active locked" title="Always shown">
+          <span class="legend-line total"></span>This week</button>`;
+        html += `<button type="button" class="legend-toggle active locked" title="Comparison baseline">
+          <span class="legend-line last-week"></span>Last week</button>`;
+      } else {
+        html += `<button type="button" class="legend-toggle active locked" data-ddi="__total__" title="Always shown">
+          <span class="legend-line total"></span>Total</button>`;
+      }
       DDI_LIST.forEach((ddi, idx) => {
         const colour = AVATAR_COLOURS[idx % AVATAR_COLOURS.length];
         const active = chartSelectedDdis.has(ddi.ddi);
@@ -2996,8 +3055,9 @@
       if (chartPeriod === 'week') {
         const thisWeekLabels = buildDayLabels(0, 7);
         const prevWeekLabels = buildDayLabels(-7, 7);
-        const thisWeekCalls = filterCallsInLabels(fortnight || [], thisWeekLabels);
-        const prevWeekCalls = filterCallsInLabels(fortnight || [], prevWeekLabels);
+        const allCalls = mergeCallRecords(fortnight || [], today || [], yesterday || []);
+        const thisWeekCalls = filterCallsInLabels(allCalls, thisWeekLabels);
+        const prevWeekCalls = filterCallsInLabels(allCalls, prevWeekLabels);
         const todayTotal = bucketByDay(thisWeekCalls, thisWeekLabels);
         const yesterdayTotal = bucketByDay(prevWeekCalls, prevWeekLabels);
         chartDataCache = {
@@ -3008,6 +3068,7 @@
           todayByDdi: bucketByDayPerDdi(thisWeekCalls, thisWeekLabels),
           yesterdayByDdi: bucketByDayPerDdi(prevWeekCalls, prevWeekLabels),
           dayLabels: thisWeekLabels,
+          prevWeekLabels,
           weekTotal: todayTotal.reduce((a, b) => a + b, 0),
           prevWeekTotal: yesterdayTotal.reduce((a, b) => a + b, 0)
         };
@@ -3024,6 +3085,7 @@
         todayByDdi: t.hourlyByDdi,
         yesterdayByDdi: y.hourlyByDdi,
         dayLabels: [],
+        prevWeekLabels: [],
         weekTotal: 0,
         prevWeekTotal: 0
       };
@@ -3037,7 +3099,7 @@
         const prev = chartDataCache.prevWeekTotal || 0;
         const pct = pctChange(total, prev);
         const sign = pct > 0 ? '+' : '';
-        el.textContent = `${total} calls this week · ${prev} last week (${sign}${pct}%)`;
+        el.textContent = `Daily volume · this week vs last week · ${total} calls (${sign}${pct}% vs ${prev})`;
       } else {
         el.textContent = 'Hourly volume · today vs yesterday';
       }
@@ -3177,8 +3239,9 @@
       if (val === chartPeriod) return;
 
       chartPeriod = val;
-      if (chartPeriod === 'week' && !fortnightCalls.length && !isDemoMode) {
-        showToast('Loading past week data...');
+      uiSnapshots.chartKey = '';
+      if (chartPeriod === 'week' && !isDemoMode) {
+        showToast('Loading week data...');
         fortnightCalls = await getFortnightCalls(true);
       }
 
