@@ -1603,14 +1603,18 @@
       { name: 'Beds',       number: '01582320570', ddi: '+441582320570', groups: [] },
       { name: 'Manchester', number: '01616740142', ddi: '+441616740142', groups: [] },
       { name: 'Bristol',    number: '01174567065', ddi: '+441174567065', groups: ['bristolincoming.service4@4com.im'] },
-      { name: 'Main',       number: '01932503647', ddi: '+441932503647', groups: ['gearboxenquiries.service4@4com.im', 'existingcustomer.service4@4com.im', 'garages24.service4@4com.im', 'nightservice.service4@4com.im'] },
+      { name: 'Gearbox',    number: '01932503647', ddi: '+441932503647-gearbox', groups: ['gearboxenquiries.service4@4com.im'] },
+      { name: 'Existing customer', number: '01932503647', ddi: '+441932503647-existing', groups: ['existingcustomer.service4@4com.im'] },
+      { name: 'Garages24',  number: '01932503647', ddi: '+441932503647-garages24', groups: ['garages24.service4@4com.im'] },
+      { name: 'Customer 24', number: '01932503647', ddi: '+441932503647-customer24', groups: ['customer24.service4@4com.im'] },
+      { name: 'Night service', number: '01932503647', ddi: '+441932503647-night', groups: ['nightservice.service4@4com.im'] },
       { name: 'Leeds',      number: '01133231775', ddi: '+441133231775', groups: ['leedsincoming.service4@4com.im'] },
       { name: 'South-east', number: '01580239610', ddi: '+441580239610', groups: ['weybridgeincoming1.service4@4com.im', 'cranbrookincoming.service4@4com.im'] },
       { name: 'Midlands',   number: '01922666376', ddi: '+441922666376', groups: ['walsallincoming.service4@4com.im'] },
       { name: 'London',     number: '02039056741', ddi: '+442039056741', groups: ['londonincoming.service4@4com.im'] },
     ];
 
-    const AVATAR_COLOURS = ['#0d77fe','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#f97316','#6366f1'];
+    const AVATAR_COLOURS = ['#0d77fe','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#f97316','#6366f1','#14b8a6','#eab308','#a855f7','#64748b'];
 
     // ============================================================
     // STATE
@@ -1838,14 +1842,14 @@
 
     function findDdiForCall(call) {
       if (!call) return null;
-      return matchDdiByNumber(call.Port || call.DDIOrGroup) ||
-        matchDdiByGroup(call.Group_no || call.DDIOrGroup) ||
+      return matchDdiByGroup(call.Group_no || call.DDIOrGroup) ||
+        matchDdiByNumber(call.Port || call.DDIOrGroup) ||
         null;
     }
 
     function findDdiByDdiOrGroup(val) {
       if (!val) return null;
-      return matchDdiByNumber(val) || matchDdiByGroup(val);
+      return matchDdiByGroup(val) || matchDdiByNumber(val);
     }
 
     function parseStatusSeconds(val) {
