@@ -1749,7 +1749,133 @@
       .kpi-label {
         font-size: 10px;
       }
+
+      .history-overlay-panel {
+        width: 100%;
+        height: 100%;
+        max-height: none;
+        border-radius: 0;
+      }
+      .history-overlay-toolbar {
+        flex-wrap: wrap;
+      }
+      .history-search {
+        min-width: 0;
+        width: 100%;
+      }
     }
+    .history-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 3000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: #02060ccc;
+      padding: 16px;
+    }
+    .history-overlay.open { display: flex; }
+    .history-overlay-panel {
+      background: var(--color-bg-surface);
+      border: 1px solid var(--color-bg-border);
+      border-radius: var(--radius-lg);
+      width: min(1100px, 100%);
+      max-height: min(88vh, 920px);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 24px 80px #00000080;
+    }
+    .history-overlay-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 20px 12px;
+      border-bottom: 1px solid var(--color-bg-border);
+    }
+    .history-overlay-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .history-overlay-sub {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+    .history-overlay-close {
+      background: transparent;
+      border: 1px solid var(--color-bg-border);
+      color: var(--color-text-secondary);
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .history-overlay-close:hover {
+      border-color: var(--color-brand-primary);
+      color: var(--color-text-primary);
+    }
+    .history-overlay-toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--color-bg-border);
+    }
+    .history-filter-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .history-filter-btn,
+    .history-export-btn {
+      background: var(--color-bg-subtle);
+      border: 1px solid var(--color-bg-border);
+      color: var(--color-text-secondary);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-sans);
+    }
+    .history-filter-btn.active,
+    .history-filter-btn:hover,
+    .history-export-btn:hover {
+      border-color: var(--color-brand-primary);
+      color: var(--color-brand-primary);
+    }
+    .history-search {
+      margin-left: auto;
+      min-width: 220px;
+      background: var(--color-bg-subtle);
+      border: 1px solid var(--color-bg-border);
+      color: var(--color-text-primary);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-size: 13px;
+      font-family: var(--font-sans);
+    }
+    .history-overlay-body {
+      overflow: auto;
+      padding: 0 12px 12px;
+      flex: 1;
+    }
+    .history-overlay-body .recent-table { min-width: 720px; }
+    .history-more-btn {
+      display: none;
+      width: calc(100% - 24px);
+      margin: 0 12px 16px;
+      padding: 10px;
+      background: transparent;
+      border: 1px dashed var(--color-bg-border);
+      border-radius: var(--radius-sm);
+      color: var(--color-text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-sans);
+    }
+    .history-more-btn.visible { display: block; }
   </style>
 </head>
 <body>
@@ -1761,6 +1887,44 @@
   </div>
 
   <div class="toast-container" id="toastContainer"></div>
+
+  <div class="history-overlay" id="historyOverlay" hidden>
+    <div class="history-overlay-panel" role="dialog" aria-modal="true" aria-labelledby="historyOverlayTitle">
+      <div class="history-overlay-header">
+        <div>
+          <div class="history-overlay-title" id="historyOverlayTitle">Call history</div>
+          <p class="history-overlay-sub" id="historyOverlaySub">Keeping every call on this browser and updating automatically.</p>
+        </div>
+        <button type="button" class="history-overlay-close" id="historyOverlayClose" aria-label="Close call history">&times;</button>
+      </div>
+      <div class="history-overlay-toolbar">
+        <div class="history-filter-btns" id="historyFilterBtns">
+          <button type="button" class="history-filter-btn active" data-filter="all">All</button>
+          <button type="button" class="history-filter-btn" data-filter="INC">Inbound</button>
+          <button type="button" class="history-filter-btn" data-filter="OUT">Outbound</button>
+          <button type="button" class="history-filter-btn" data-filter="IU">Missed</button>
+        </div>
+        <input class="history-search" id="historySearch" type="search" placeholder="Search line or number" autocomplete="off">
+        <button type="button" class="history-export-btn" id="historyExportBtn">Download CSV</button>
+      </div>
+      <div class="history-overlay-body">
+        <table class="recent-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Line</th>
+              <th>Caller</th>
+              <th>Duration</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody id="historyCallsBody"></tbody>
+        </table>
+      </div>
+      <button type="button" class="history-more-btn" id="historyMoreBtn">Show more calls</button>
+    </div>
+  </div>
 
   <div class="dashboard-layout">
 
@@ -1920,7 +2084,7 @@
                   <tbody id="recentCallsBody"></tbody>
                 </table>
                 </div>
-                <button class="view-all-btn">View full history</button>
+                <button type="button" class="view-all-btn" id="viewFullHistoryBtn">View full history</button>
               </div>
             </div>
 
@@ -2017,7 +2181,7 @@
             </div>
 
             <div class="recorder-selected-note" id="recorderSelectedNote">Showing today</div>
-            <p class="recorder-data-meta" id="recorderDataMeta">Loading last 30 days of call history…</p>
+            <p class="recorder-data-meta" id="recorderDataMeta">Loading and storing call history…</p>
 
             <div class="recorder-stats-row">
               <div class="recorder-stat">
@@ -2170,7 +2334,15 @@
     let todayCalls = [];
     let yesterdayCalls = [];
     let fortnightCalls = [];
+    let archivedCalls = [];
     let liveCalls = [];
+    let historyModalOpen = false;
+    let historyFilter = 'all';
+    let historySearch = '';
+    let historyShowCount = 250;
+    const HISTORY_PAGE_SIZE = 250;
+    const CALL_ARCHIVE_DB = 's4s-call-archive';
+    const CALL_ARCHIVE_STORE = 'calls';
     let ddiStatuses = {};
     let tickerEvents = [];
     let prevKpiValues = {};
@@ -2204,7 +2376,8 @@
       recentKey: '',
       tickerKey: '',
       missedKey: '',
-      recorderKey: ''
+      recorderKey: '',
+      historyKey: ''
     };
 
     DDI_LIST.forEach(d => { ddiStatuses[d.ddi] = 'idle'; });
@@ -2240,16 +2413,129 @@
     }
 
     function mergeCallRecords(...sources) {
-      const seen = new Set();
-      const out = [];
+      const byId = new Map();
       sources.flat().filter(Boolean).forEach(c => {
         if (!c) return;
-        const key = callRecordKey(c);
-        if (seen.has(key)) return;
-        seen.add(key);
-        out.push(c);
+        const key = archiveCallId(c);
+        byId.set(key, preferCallRecord(byId.get(key), c));
       });
-      return out;
+      return Array.from(byId.values());
+    }
+
+    function archiveCallId(c) {
+      if (!c) return '';
+      if (c._archiveId) return c._archiveId;
+      if (c.RecordId) return 'rid:' + c.RecordId;
+      if (c.CallId) return 'cid:' + c.CallId;
+      return 'fp:' + callRecordKey(c);
+    }
+
+    function sanitiseCallForArchive(c) {
+      const copy = Object.assign({}, c);
+      delete copy._ddi;
+      delete copy._startTime;
+      copy._archiveId = archiveCallId(c);
+      return copy;
+    }
+
+    function callCompleteness(c) {
+      return Number(c.Duration || 0) + Number(c.Talk_time || 0) + Number(c.Ring_time || 0) +
+        (c.Unanswer != null && c.Unanswer !== '' ? 1 : 0);
+    }
+
+    function preferCallRecord(existing, incoming) {
+      if (!existing) return incoming;
+      return callCompleteness(incoming) >= callCompleteness(existing) ? incoming : existing;
+    }
+
+    function getAllKnownCalls() {
+      if (isDemoMode) return mergeCallRecords(demoFortnightCalls, demoTodayCalls, demoYesterdayCalls);
+      return mergeCallRecords(archivedCalls, fortnightCalls, todayCalls, yesterdayCalls);
+    }
+
+    function openCallArchiveDb() {
+      return new Promise((resolve, reject) => {
+        if (!window.indexedDB) {
+          reject(new Error('IndexedDB not available'));
+          return;
+        }
+        const req = indexedDB.open(CALL_ARCHIVE_DB, 1);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains(CALL_ARCHIVE_STORE)) {
+            db.createObjectStore(CALL_ARCHIVE_STORE, { keyPath: '_archiveId' });
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error || new Error('IndexedDB open failed'));
+      });
+    }
+
+    async function loadCallArchive() {
+      if (isDemoMode || DEMO_MODE) return;
+      try {
+        const db = await openCallArchiveDb();
+        archivedCalls = await new Promise((resolve, reject) => {
+          const tx = db.transaction(CALL_ARCHIVE_STORE, 'readonly');
+          const req = tx.objectStore(CALL_ARCHIVE_STORE).getAll();
+          req.onsuccess = () => resolve(req.result || []);
+          req.onerror = () => reject(req.error);
+        });
+        debug('Call archive loaded: ' + archivedCalls.length);
+      } catch (e) {
+        debug('Call archive load failed: ' + (e && e.message ? e.message : e));
+        archivedCalls = archivedCalls || [];
+      }
+    }
+
+    async function persistArchive(changedCalls) {
+      if (isDemoMode || !changedCalls || !changedCalls.length) return;
+      try {
+        const db = await openCallArchiveDb();
+        await new Promise((resolve, reject) => {
+          const tx = db.transaction(CALL_ARCHIVE_STORE, 'readwrite');
+          const store = tx.objectStore(CALL_ARCHIVE_STORE);
+          changedCalls.forEach(c => store.put(c));
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error);
+        });
+      } catch (e) {
+        debug('Call archive save failed: ' + (e && e.message ? e.message : e));
+      }
+    }
+
+    function ingestCallsIntoArchive(calls) {
+      if (isDemoMode || !calls || !calls.length) return 0;
+      const byId = new Map(archivedCalls.map(c => [archiveCallId(c), c]));
+      const changed = [];
+      let added = 0;
+      calls.forEach(raw => {
+        if (!raw) return;
+        const incoming = sanitiseCallForArchive(raw);
+        const existing = byId.get(incoming._archiveId);
+        if (!existing) {
+          byId.set(incoming._archiveId, incoming);
+          changed.push(incoming);
+          added++;
+          return;
+        }
+        const better = callCompleteness(incoming) > callCompleteness(existing) ||
+          callRecordKey(incoming) !== callRecordKey(existing);
+        if (!better) return;
+        incoming._archiveId = existing._archiveId;
+        byId.set(existing._archiveId, incoming);
+        changed.push(incoming);
+      });
+      if (changed.length) {
+        archivedCalls = Array.from(byId.values());
+        persistArchive(changed);
+        uiSnapshots.recorderKey = '';
+        uiSnapshots.recentKey = '';
+        uiSnapshots.historyKey = '';
+        updateHistoryButton();
+        if (historyModalOpen) renderCallHistory(true);
+      }
+      return added;
     }
 
     // ============================================================
@@ -2706,13 +2992,17 @@
       const panel = document.getElementById('call-recorder-panel');
       if (panel) panel.classList.toggle('recorder-loading', loading);
       const meta = document.getElementById('recorderDataMeta');
-      if (meta && loading) meta.textContent = 'Loading last 30 days of call history…';
+      if (meta && loading) meta.textContent = 'Loading and storing call history…';
     }
 
     async function getFortnightCalls(force) {
       if (isDemoMode) return demoFortnightCalls;
 
-      const mergeFresh = () => mergeCallRecords(fortnightCalls, todayCalls, yesterdayCalls);
+      const mergeFresh = () => {
+        const merged = mergeCallRecords(fortnightCalls, todayCalls, yesterdayCalls, archivedCalls);
+        ingestCallsIntoArchive(merged);
+        return merged;
+      };
 
       if (!force && Date.now() - lastFortnightFetchAt < FORTNIGHT_TTL_MS && fortnightCalls.length && fortnightFetchDays >= RECORDER_MAX_DAYS) {
         return mergeFresh();
@@ -2731,9 +3021,10 @@
         spanCalls = mergeCallRecords(spanCalls, await getCallsForSpan(s, e));
       }
 
-      fortnightCalls = mergeCallRecords(spanCalls, todayCalls, yesterdayCalls);
+      fortnightCalls = mergeCallRecords(spanCalls, todayCalls, yesterdayCalls, archivedCalls);
       lastFortnightFetchAt = Date.now();
       fortnightFetchDays = RECORDER_MAX_DAYS;
+      ingestCallsIntoArchive(fortnightCalls);
       setRecorderLoading(false);
       debug('Recorder history loaded: ' + fortnightCalls.length + ' calls');
       renderCallRecorder(true);
@@ -3136,7 +3427,9 @@
     }
 
     function buildRecorderData(fortnight) {
-      const merged = mergeCallRecords(fortnight || [], todayCalls || [], yesterdayCalls || []);
+      const merged = isDemoMode
+        ? mergeCallRecords(fortnight || [], demoTodayCalls || [], demoYesterdayCalls || [])
+        : getAllKnownCalls();
       const periodDays = recorderPeriodDays;
       const dayLabels = buildDayLabels(0, periodDays);
       const todayStr = getLondonDateString(0);
@@ -3175,13 +3468,21 @@
 
       const loadedDayLabels = buildDayLabels(0, RECORDER_MAX_DAYS);
       const calendarTotals = {};
+      merged.forEach(c => {
+        if (!isInboundCall(c)) return;
+        const ddi = findDdiForCall(c);
+        if (!ddi) return;
+        if (!RECORDER_LINES.some(line => line.ddiKeys.includes(ddi.ddi))) return;
+        const d = getCallDate(getCallDateField(c));
+        if (d) calendarTotals[d] = (calendarTotals[d] || 0) + 1;
+      });
       loadedDayLabels.forEach(dateStr => {
-        const dayCalls = filterCallsInLabels(merged, [dateStr]);
-        let total = 0;
-        RECORDER_LINES.forEach(line => {
-          total += countRecorderLineCalls(dayCalls, line);
-        });
-        calendarTotals[dateStr] = total;
+        if (calendarTotals[dateStr] == null) calendarTotals[dateStr] = 0;
+      });
+
+      let oldestDate = loadedDayLabels[0] || getLondonDateString(0);
+      Object.keys(calendarTotals).forEach(d => {
+        if (d < oldestDate) oldestDate = d;
       });
 
       return {
@@ -3193,7 +3494,9 @@
         dailyRows,
         overallTotal,
         calendarTotals,
-        loadedDayLabels
+        loadedDayLabels,
+        oldestDate,
+        archiveCount: merged.length
       };
     }
 
@@ -3249,6 +3552,7 @@
       const grid = document.getElementById('recorderCalendar');
       const titleEl = document.getElementById('recorderCalTitle');
       const nextBtn = document.getElementById('recorderCalNext');
+      const prevBtn = document.getElementById('recorderCalPrev');
       if (!grid || !titleEl) return;
 
       const view = getRecorderCalendarView();
@@ -3257,12 +3561,14 @@
 
       const todayStr = data.todayStr;
       const viewDate = data.viewDate;
-      const loadedSet = new Set(data.loadedDayLabels);
-      const oldestLoaded = data.loadedDayLabels[0] || todayStr;
+      const oldestBound = data.oldestDate || data.loadedDayLabels[0] || todayStr;
       const peak = Math.max(...Object.values(data.calendarTotals), 1);
       const nowParts = getLondonParts(new Date());
       const isCurrentMonth = view.year === +nowParts.year && view.month === +nowParts.month;
+      const oldestParts = oldestBound.split('-');
+      const isOldestMonth = view.year === +oldestParts[0] && view.month === +oldestParts[1];
       if (nextBtn) nextBtn.disabled = isCurrentMonth;
+      if (prevBtn) prevBtn.disabled = isOldestMonth;
 
       const daysInMonth = new Date(Date.UTC(view.year, view.month, 0)).getUTCDate();
       let startDow = new Date(Date.UTC(view.year, view.month - 1, 1)).getUTCDay();
@@ -3278,7 +3584,7 @@
         const d = String(day).padStart(2, '0');
         const dateStr = `${view.year}-${m}-${d}`;
         const isFuture = dateStr > todayStr;
-        const inRange = loadedSet.has(dateStr) && dateStr >= oldestLoaded;
+        const inRange = !isFuture && dateStr >= oldestBound;
         const total = inRange ? (data.calendarTotals[dateStr] || 0) : null;
         const isToday = dateStr === todayStr;
         const isSelected = dateStr === viewDate;
@@ -3483,13 +3789,14 @@
       const metaEl = document.getElementById('recorderDataMeta');
       if (metaEl) {
         if (recorderHistoryLoading) {
-          metaEl.textContent = 'Loading last 30 days of call history…';
+          metaEl.textContent = 'Loading and storing call history…';
         } else {
           const mins = lastFortnightFetchAt ? Math.round((Date.now() - lastFortnightFetchAt) / 60000) : null;
           const daysWithCalls = data.loadedDayLabels.filter(d => (data.calendarTotals[d] || 0) > 0).length;
+          const kept = isDemoMode ? data.archiveCount : archivedCalls.length;
           metaEl.textContent = mins === null
-            ? `Inbound calls by line · ${RECORDER_MAX_DAYS}-day history`
-            : `Inbound calls by line · ${daysWithCalls} active days in last ${recorderPeriodDays} · updated ${mins < 1 ? 'just now' : mins + ' min ago'}`;
+            ? `Keeping ${kept.toLocaleString('en-GB')} calls · auto-updating`
+            : `Keeping ${kept.toLocaleString('en-GB')} calls · ${daysWithCalls} active days in last ${recorderPeriodDays} · updated ${mins < 1 ? 'just now' : mins + ' min ago'}`;
         }
       }
 
@@ -3765,6 +4072,7 @@
       const tbody = document.getElementById('recentCallsBody');
       if (recent.length === 0) {
         tbody.innerHTML = '<tr><td colspan="4" class="empty-state" style="padding:20px;">No calls yet today</td></tr>';
+        updateHistoryButton();
         return;
       }
       tbody.innerHTML = recent.map(c => {
@@ -3784,6 +4092,140 @@
           <td><span class="dir-icon ${dirClass}">${dirIcon}</span></td>
         </tr>`;
       }).join('');
+      updateHistoryButton();
+    }
+
+    function getHistorySourceCalls() {
+      return getAllKnownCalls();
+    }
+
+    function updateHistoryButton() {
+      const btn = document.getElementById('viewFullHistoryBtn');
+      if (!btn) return;
+      const n = getHistorySourceCalls().length;
+      btn.textContent = n
+        ? `View full history (${n.toLocaleString('en-GB')} calls)`
+        : 'View full history';
+    }
+
+    function getFilteredHistoryCalls() {
+      const q = historySearch.trim().toLowerCase();
+      return getHistorySourceCalls()
+        .filter(c => {
+          const dir = normaliseDirection(c);
+          if (historyFilter !== 'all' && dir !== historyFilter) return false;
+          if (!q) return true;
+          const ddi = findDdiForCall(c);
+          const hay = [
+            ddi ? ddi.name : '',
+            ddi ? ddi.number : '',
+            c.Caller_ID || '',
+            c.Number || '',
+            c.Port || '',
+            c.DDIOrGroup || ''
+          ].join(' ').toLowerCase();
+          return hay.includes(q);
+        })
+        .sort((a, b) => (b.Call_date || '').localeCompare(a.Call_date || ''));
+    }
+
+    function historyTypeLabel(dir) {
+      if (dir === 'IU') return { icon: '\u2715', cls: 'dir-missed', text: 'Missed' };
+      if (dir === 'OUT') return { icon: '\u2191', cls: 'dir-out', text: 'Outbound' };
+      return { icon: '\u2193', cls: 'dir-inc', text: 'Inbound' };
+    }
+
+    function renderCallHistory(force) {
+      const filtered = getFilteredHistoryCalls();
+      const key = `${historyFilter}:${historySearch}:${historyShowCount}:${filtered.length}:${filtered[0] ? callRecordKey(filtered[0]) : ''}`;
+      if (!force && key === uiSnapshots.historyKey) return;
+      uiSnapshots.historyKey = key;
+
+      const sub = document.getElementById('historyOverlaySub');
+      const tbody = document.getElementById('historyCallsBody');
+      const moreBtn = document.getElementById('historyMoreBtn');
+      const total = getHistorySourceCalls().length;
+      if (sub) {
+        sub.textContent = `Keeping ${total.toLocaleString('en-GB')} calls on this browser · showing ${Math.min(filtered.length, historyShowCount).toLocaleString('en-GB')} of ${filtered.length.toLocaleString('en-GB')} matching`;
+      }
+      if (!tbody) return;
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state" style="padding:20px;">No matching calls in the archive yet</td></tr>';
+        if (moreBtn) moreBtn.classList.remove('visible');
+        return;
+      }
+      const visible = filtered.slice(0, historyShowCount);
+      tbody.innerHTML = visible.map(c => {
+        const ddi = findDdiForCall(c);
+        const dateStr = getCallDate(getCallDateField(c));
+        const timeMatch = String(c.Call_date || '').match(/(\d{2}:\d{2})/);
+        const time = timeMatch ? timeMatch[1] : '--:--';
+        const dateLabel = dateStr ? formatRecorderDate(dateStr) : '--';
+        const dur = formatDuration(c.Talk_time || c.Duration || 0);
+        const dir = normaliseDirection(c);
+        const type = historyTypeLabel(dir);
+        return `<tr>
+          <td class="cell-mono">${dateLabel}</td>
+          <td class="cell-mono">${time}</td>
+          <td class="cell-strong">${ddi ? ddi.name : 'Unknown'}</td>
+          <td class="cell-mono">${formatPhoneDisplay(formatCallerId(c))}</td>
+          <td class="cell-mono">${dur}</td>
+          <td><span class="dir-icon ${type.cls}" title="${type.text}">${type.icon}</span></td>
+        </tr>`;
+      }).join('');
+      if (moreBtn) moreBtn.classList.toggle('visible', filtered.length > visible.length);
+    }
+
+    function openCallHistory() {
+      historyModalOpen = true;
+      historyShowCount = HISTORY_PAGE_SIZE;
+      const overlay = document.getElementById('historyOverlay');
+      if (overlay) {
+        overlay.hidden = false;
+        overlay.classList.add('open');
+      }
+      renderCallHistory(true);
+      const search = document.getElementById('historySearch');
+      if (search) search.focus();
+    }
+
+    function closeCallHistory() {
+      historyModalOpen = false;
+      const overlay = document.getElementById('historyOverlay');
+      if (overlay) {
+        overlay.classList.remove('open');
+        overlay.hidden = true;
+      }
+    }
+
+    function downloadHistoryCsv() {
+      const rows = getFilteredHistoryCalls();
+      const header = ['Date', 'Time', 'Line', 'Caller', 'Duration', 'Type', 'Direction'];
+      const csvRows = [header.join(',')];
+      rows.forEach(c => {
+        const ddi = findDdiForCall(c);
+        const dateStr = getCallDate(getCallDateField(c)) || '';
+        const timeMatch = String(c.Call_date || '').match(/(\d{2}:\d{2}:\d{2}|\d{2}:\d{2})/);
+        const dir = normaliseDirection(c);
+        const type = historyTypeLabel(dir);
+        const vals = [
+          dateStr,
+          timeMatch ? timeMatch[1] : '',
+          ddi ? ddi.name : 'Unknown',
+          formatPhoneDisplay(formatCallerId(c)),
+          formatDuration(c.Talk_time || c.Duration || 0),
+          type.text,
+          dir
+        ].map(v => `"${String(v).replace(/"/g, '""')}"`);
+        csvRows.push(vals.join(','));
+      });
+      const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `s4s-call-history-${getLondonDateString(0)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
     }
 
     function renderMissedCalls(calls, yesterdayCalls, force) {
@@ -4197,10 +4639,11 @@
       updateDdiTableCounts(t.ddiCounts, y.ddiCounts, force);
       refreshChartCache(today, yesterday, fortnightCalls);
       renderChart(force);
-      renderRecentCalls(today, force);
+      renderRecentCalls(getAllKnownCalls(), force);
       renderMissedCalls(today, yesterday, force);
       renderCallRecorder(force);
       renderTicker(force);
+      if (historyModalOpen) renderCallHistory(force);
     }
 
     async function pollAllData(force) {
@@ -4251,6 +4694,7 @@
         }
 
         fortnightCalls = await getFortnightCalls(false);
+        ingestCallsIntoArchive(mergeCallRecords(todayCalls, yesterdayCalls, fortnightCalls));
 
         refreshHistoricalUi(force);
         updateLastUpdated();
@@ -4343,6 +4787,38 @@
       if (tr) selectRecorderDate(tr.dataset.date);
     });
 
+    document.getElementById('viewFullHistoryBtn').addEventListener('click', openCallHistory);
+    document.getElementById('historyOverlayClose').addEventListener('click', closeCallHistory);
+    document.getElementById('historyOverlay').addEventListener('click', e => {
+      if (e.target.id === 'historyOverlay') closeCallHistory();
+    });
+    document.getElementById('historyFilterBtns').addEventListener('click', e => {
+      const btn = e.target.closest('.history-filter-btn');
+      if (!btn) return;
+      historyFilter = btn.dataset.filter || 'all';
+      document.querySelectorAll('.history-filter-btn').forEach(b => {
+        b.classList.toggle('active', b === btn);
+      });
+      historyShowCount = HISTORY_PAGE_SIZE;
+      uiSnapshots.historyKey = '';
+      renderCallHistory(true);
+    });
+    document.getElementById('historySearch').addEventListener('input', e => {
+      historySearch = e.target.value || '';
+      historyShowCount = HISTORY_PAGE_SIZE;
+      uiSnapshots.historyKey = '';
+      renderCallHistory(true);
+    });
+    document.getElementById('historyMoreBtn').addEventListener('click', () => {
+      historyShowCount += HISTORY_PAGE_SIZE;
+      uiSnapshots.historyKey = '';
+      renderCallHistory(true);
+    });
+    document.getElementById('historyExportBtn').addEventListener('click', downloadHistoryCsv);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && historyModalOpen) closeCallHistory();
+    });
+
     // ============================================================
     // INIT
     // ============================================================
@@ -4350,6 +4826,11 @@
       if (DEMO_MODE) {
         activateDemoMode('Demo mode is enabled in the dashboard config.');
       } else {
+        await loadCallArchive();
+        if (archivedCalls.length) {
+          fortnightCalls = archivedCalls.slice();
+          refreshHistoricalUi(true);
+        }
         startPolling();
       }
 
@@ -4360,6 +4841,7 @@
         });
         renderTicker();
       }
+      updateHistoryButton();
     }
 
     init();
