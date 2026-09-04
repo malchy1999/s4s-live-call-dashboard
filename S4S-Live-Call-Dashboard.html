@@ -455,6 +455,434 @@
     .table-scroll .ddi-table {
       min-width: 520px;
     }
+
+    /* Call recorder (visual breakdown) */
+    .panel-recorder {
+      grid-column: 1 / -1;
+    }
+    .recorder-stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-3);
+      margin-bottom: var(--space-5);
+    }
+    .recorder-stat {
+      background: var(--color-bg-subtle);
+      border: 1px solid var(--color-bg-border);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      text-align: center;
+    }
+    .recorder-stat-val {
+      display: block;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--color-brand-primary);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+    }
+    .recorder-stat-val.recorder-stat-name {
+      font-size: 20px;
+      color: var(--color-text-primary);
+    }
+    .recorder-stat-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-top: 4px;
+    }
+    .recorder-charts {
+      display: grid;
+      grid-template-columns: minmax(200px, 1fr) 1fr;
+      gap: var(--space-4);
+    }
+    .recorder-charts-inline {
+      min-width: 0;
+    }
+    .recorder-chart-box {
+      background: var(--color-bg-subtle);
+      border: 1px solid var(--color-bg-border);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      min-width: 0;
+    }
+    .recorder-chart-box-wide {
+      grid-column: span 1;
+    }
+    .recorder-charts-row2 {
+      grid-column: 1 / -1;
+    }
+    .recorder-chart-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--color-text-secondary);
+      margin-bottom: 12px;
+    }
+    .recorder-pie-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    #recorderPieSvg {
+      width: 160px;
+      height: 160px;
+      display: block;
+    }
+    .recorder-pie-legend {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .recorder-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--color-text-secondary);
+    }
+    .recorder-legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .recorder-legend-pct {
+      margin-left: auto;
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+    .recorder-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .recorder-bar-row {
+      display: grid;
+      grid-template-columns: 88px 1fr 36px 40px;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+    }
+    .recorder-bar-label {
+      font-weight: 600;
+      color: var(--color-text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .recorder-bar-track {
+      height: 10px;
+      background: var(--color-bg-border);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .recorder-bar-fill {
+      height: 100%;
+      border-radius: 5px;
+      min-width: 2px;
+      transition: width 0.4s ease;
+    }
+    .recorder-bar-value {
+      font-weight: 700;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .recorder-bar-pct {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      text-align: right;
+    }
+    .recorder-trend-svg {
+      width: 100%;
+      height: 140px;
+      display: block;
+    }
+    .recorder-details {
+      border-top: 1px solid var(--color-bg-border);
+      padding-top: var(--space-3);
+      margin-top: var(--space-2);
+    }
+    .recorder-details summary {
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-brand-primary);
+      padding: 8px 0;
+      list-style: none;
+    }
+    .recorder-details summary::-webkit-details-marker { display: none; }
+    .recorder-details summary::before {
+      content: '▸ ';
+      display: inline-block;
+      transition: transform 0.2s;
+    }
+    .recorder-details[open] summary::before {
+      transform: rotate(90deg);
+    }
+    .recorder-details-body {
+      padding-top: var(--space-3);
+    }
+    .recorder-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 12px 0 8px;
+    }
+    .recorder-summary-wrap {
+      overflow-x: auto;
+      margin-bottom: 4px;
+    }
+    .recorder-daily-scroll {
+      max-height: 280px;
+      overflow: auto;
+    }
+    .recorder-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+    .recorder-table th,
+    .recorder-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--color-bg-border);
+      white-space: nowrap;
+    }
+    .recorder-table th {
+      background: var(--color-bg-subtle);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      text-align: right;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .recorder-table th.recorder-text-col,
+    .recorder-table td.recorder-text-col {
+      text-align: left;
+    }
+    .recorder-table td.recorder-num {
+      text-align: right;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    .recorder-table td.recorder-today {
+      color: var(--color-brand-primary);
+      font-weight: 700;
+    }
+    .recorder-table tr.recorder-row-today td {
+      background: rgba(13, 119, 254, 0.06);
+    }
+    .recorder-table td.recorder-daily-total {
+      font-weight: 800;
+      color: var(--color-text-primary);
+    }
+    .recorder-table .recorder-zero {
+      color: var(--color-text-muted);
+      font-weight: 500;
+    }
+    @media (max-width: 900px) {
+      .recorder-stats-row { grid-template-columns: 1fr; }
+      .recorder-charts { grid-template-columns: 1fr; }
+      .recorder-toolbar { flex-direction: column; align-items: stretch; }
+      .recorder-bar-row {
+        grid-template-columns: 72px 1fr 32px 36px;
+        gap: 6px;
+      }
+    }
+    .recorder-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: var(--space-4);
+    }
+    .recorder-period-btns {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .recorder-period-btn,
+    .recorder-today-btn {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--color-bg-border);
+      background: var(--color-bg-subtle);
+      color: var(--color-text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .recorder-period-btn:hover,
+    .recorder-today-btn:hover {
+      border-color: var(--color-brand-primary);
+      color: var(--color-brand-primary);
+    }
+    .recorder-period-btn.active {
+      background: var(--color-info-dim);
+      border-color: #0d77fe40;
+      color: var(--color-brand-primary);
+    }
+    .recorder-today-btn.active {
+      background: var(--color-brand-primary);
+      border-color: var(--color-brand-primary);
+      color: #fff;
+    }
+    .recorder-layout {
+      display: grid;
+      grid-template-columns: minmax(240px, 280px) 1fr;
+      gap: var(--space-4);
+      margin-bottom: var(--space-4);
+    }
+    .recorder-calendar-box {
+      background: var(--color-bg-subtle);
+      border: 1px solid var(--color-bg-border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+    }
+    .recorder-calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .recorder-cal-nav {
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--color-bg-border);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--color-text-secondary);
+      font-size: 16px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .recorder-cal-nav:hover { border-color: var(--color-brand-primary); color: var(--color-brand-primary); }
+    .recorder-cal-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+    .recorder-calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      margin-bottom: 4px;
+    }
+    .recorder-calendar-weekdays span {
+      text-align: center;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+    }
+    .recorder-calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
+    }
+    .recorder-cal-day {
+      aspect-ratio: 1;
+      min-height: 36px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: #fff;
+      padding: 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all var(--transition-fast);
+    }
+    .recorder-cal-day:hover:not(:disabled) {
+      border-color: var(--color-brand-primary);
+      background: rgba(13, 119, 254, 0.06);
+    }
+    .recorder-cal-day.empty { visibility: hidden; pointer-events: none; }
+    .recorder-cal-day:disabled {
+      opacity: 0.35;
+      cursor: default;
+      background: transparent;
+    }
+    .recorder-cal-day.selected {
+      border-color: var(--color-brand-primary);
+      background: rgba(13, 119, 254, 0.12);
+      box-shadow: 0 0 0 2px rgba(13, 119, 254, 0.2);
+    }
+    .recorder-cal-day.is-today:not(.selected) {
+      border-color: #0d77fe60;
+    }
+    .recorder-cal-day-num {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      line-height: 1;
+    }
+    .recorder-cal-day-count {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--color-brand-primary);
+      line-height: 1;
+    }
+    .recorder-cal-day.outside-range {
+      opacity: 0.28;
+      cursor: default;
+      background: transparent;
+    }
+    .recorder-cal-day.quiet:not(.selected) {
+      background: #fafbfc;
+    }
+    .recorder-cal-day.has-calls:not(.selected):not(.is-today) {
+      border-color: #0d77fe25;
+    }
+    .recorder-cal-day-count.zero { color: var(--color-text-muted); font-weight: 500; }
+    .recorder-data-meta {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      margin: -4px 0 var(--space-3);
+    }
+    .panel-recorder.recorder-loading .recorder-calendar-grid,
+    .panel-recorder.recorder-loading .recorder-charts-inline {
+      opacity: 0.55;
+      pointer-events: none;
+    }
+    .recorder-cal-nav:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+    .recorder-daily-row-clickable { cursor: pointer; }
+    .recorder-daily-row-clickable:hover td { background: rgba(13, 119, 254, 0.04); }
+    .recorder-calendar-hint {
+      margin: 10px 0 0;
+      font-size: 11px;
+      color: var(--color-text-muted);
+      text-align: center;
+    }
+    .recorder-selected-note {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-brand-primary);
+      margin-bottom: var(--space-3);
+    }
+    @media (max-width: 900px) {
+      .recorder-layout { grid-template-columns: 1fr; }
+    }
     #numbers-panel .table-scroll .ddi-table {
       min-width: 480px;
     }
@@ -1570,6 +1998,103 @@
               </div>
             </div>
           </div>
+
+          <div class="panel-recorder card card-enter" id="call-recorder-panel" style="animation-delay:720ms">
+            <div class="card-header">
+              <div>
+                <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg> Call breakdown by line</div>
+                <p class="card-desc">Simple view of inbound calls per number — pie chart, bar chart, and daily trend</p>
+              </div>
+            </div>
+
+            <div class="recorder-toolbar">
+              <div class="recorder-period-btns" id="recorderPeriodBtns">
+                <button type="button" class="recorder-period-btn" data-days="7">7 days</button>
+                <button type="button" class="recorder-period-btn active" data-days="14">14 days</button>
+                <button type="button" class="recorder-period-btn" data-days="30">30 days</button>
+              </div>
+              <button type="button" class="recorder-today-btn active" id="recorderTodayBtn">Today</button>
+            </div>
+
+            <div class="recorder-selected-note" id="recorderSelectedNote">Showing today</div>
+            <p class="recorder-data-meta" id="recorderDataMeta">Loading last 30 days of call history…</p>
+
+            <div class="recorder-stats-row">
+              <div class="recorder-stat">
+                <span class="recorder-stat-val" id="recorderViewTotal">--</span>
+                <span class="recorder-stat-label" id="recorderViewLabel">Calls on selected day</span>
+              </div>
+              <div class="recorder-stat">
+                <span class="recorder-stat-val" id="recorderPeriodTotal">--</span>
+                <span class="recorder-stat-label" id="recorderPeriodLabel">Last 14 days total</span>
+              </div>
+              <div class="recorder-stat">
+                <span class="recorder-stat-val recorder-stat-name" id="recorderTopLine">--</span>
+                <span class="recorder-stat-label" id="recorderTopLabel">Busiest line</span>
+              </div>
+            </div>
+
+            <div class="recorder-layout">
+              <div class="recorder-calendar-box">
+                <div class="recorder-calendar-header">
+                  <button type="button" class="recorder-cal-nav" id="recorderCalPrev" aria-label="Previous month">‹</button>
+                  <span class="recorder-cal-title" id="recorderCalTitle">--</span>
+                  <button type="button" class="recorder-cal-nav" id="recorderCalNext" aria-label="Next month">›</button>
+                </div>
+                <div class="recorder-calendar-weekdays">
+                  <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                </div>
+                <div class="recorder-calendar-grid" id="recorderCalendar"></div>
+                <p class="recorder-calendar-hint">Darker blue = busier day · click to drill down</p>
+              </div>
+
+              <div class="recorder-charts recorder-charts-inline">
+              <div class="recorder-chart-box">
+                <div class="recorder-chart-title" id="recorderPieTitle">Share on selected day</div>
+                <div class="recorder-pie-wrap">
+                  <svg id="recorderPieSvg" viewBox="0 0 180 180" aria-label="Pie chart of calls by line"></svg>
+                  <div class="recorder-pie-legend" id="recorderPieLegend"></div>
+                </div>
+              </div>
+              <div class="recorder-chart-box">
+                <div class="recorder-chart-title" id="recorderBarsTitle">Calls by line</div>
+                <div class="recorder-bars" id="recorderBars"></div>
+              </div>
+              </div>
+            </div>
+
+            <div class="recorder-chart-box recorder-charts-row2" style="margin-bottom:var(--space-4)">
+              <div class="recorder-chart-title" id="recorderTrendTitle">Daily total — last 14 days</div>
+              <svg class="recorder-trend-svg" id="recorderTrendSvg" viewBox="0 0 600 140" preserveAspectRatio="xMidYMid meet" aria-label="Daily call trend"></svg>
+            </div>
+
+            <details class="recorder-details">
+              <summary>View full spreadsheet table</summary>
+              <div class="recorder-details-body">
+                <div class="recorder-section-title">Line totals</div>
+                <div class="recorder-summary-wrap">
+                  <table class="recorder-table" id="recorderSummaryTable">
+                    <thead>
+                      <tr>
+                        <th class="recorder-text-col">Line</th>
+                        <th class="recorder-text-col">Phone number</th>
+                        <th id="recorderSummaryDayCol">Today</th>
+                        <th id="recorderSummaryPeriodCol">Total (14 days)</th>
+                      </tr>
+                    </thead>
+                    <tbody id="recorderSummaryBody"></tbody>
+                  </table>
+                </div>
+                <div class="recorder-section-title">Daily call totals</div>
+                <div class="table-scroll recorder-daily-scroll">
+                  <table class="recorder-table" id="recorderDailyTable">
+                    <thead id="recorderDailyHead"></thead>
+                    <tbody id="recorderDailyBody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </details>
+          </div>
         </div>
       </div>
 
@@ -1616,6 +2141,28 @@
 
     const AVATAR_COLOURS = ['#0d77fe','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#f97316','#6366f1','#14b8a6','#eab308','#a855f7','#64748b'];
 
+    // Matches Simple_Call_Number_Recorder spreadsheet lines (Main rolls up all 01932 queues)
+    const RECORDER_MAX_DAYS = 30;
+    const RECORDER_LINES = [
+      { name: 'Main', number: '01932503647', ddiKeys: ['+441932503647-gearbox', '+441932503647-existing', '+441932503647-garages24', '+441932503647-customer24', '+441932503647-night'] },
+      { name: 'A1', number: '01767669575', ddiKeys: ['+441767669575'] },
+      { name: 'Beds', number: '01582320570', ddiKeys: ['+441582320570'] },
+      { name: 'Manchester', number: '01616740142', ddiKeys: ['+441616740142'] },
+      { name: 'Bristol', number: '01174567065', ddiKeys: ['+441174567065'] },
+      { name: 'Leeds', number: '01133231775', ddiKeys: ['+441133231775'] },
+      { name: 'South East', number: '01580239610', ddiKeys: ['+441580239610'] },
+      { name: 'Midlands', number: '01922666376', ddiKeys: ['+441922666376'] },
+      { name: 'London', number: '02039056741', ddiKeys: ['+442039056741'] },
+    ];
+    const RECORDER_LINE_COLOURS = [
+      '#0d77fe', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
+      '#ec4899', '#06b6d4', '#f97316', '#6366f1'
+    ];
+
+    function getRecorderLineColour(index) {
+      return RECORDER_LINE_COLOURS[index % RECORDER_LINE_COLOURS.length];
+    }
+
     // ============================================================
     // STATE
     // ============================================================
@@ -1636,6 +2183,11 @@
     const POLL_INTERVAL_MS = 30000;
     const FORTNIGHT_TTL_MS = 5 * 60 * 1000;
     let lastFortnightFetchAt = 0;
+    let fortnightFetchDays = 0;
+    let recorderPeriodDays = 14;
+    let recorderSelectedDate = null;
+    let recorderCalendarView = null;
+    let recorderHistoryLoading = false;
     let chartDataCache = null;
     let chartPeriod = 'today';
     const chartSelectedDdis = new Set();
@@ -1651,7 +2203,8 @@
       chartKey: '',
       recentKey: '',
       tickerKey: '',
-      missedKey: ''
+      missedKey: '',
+      recorderKey: ''
     };
 
     DDI_LIST.forEach(d => { ddiStatuses[d.ddi] = 'idle'; });
@@ -1756,10 +2309,17 @@
       const str = String(callDate).trim();
       let m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
       if (m) return `${m[1]}-${m[2]}-${m[3]}`;
-      m = str.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
-      if (m) return `${m[3]}-${m[2]}-${m[1]}`;
+      m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+      if (m) {
+        return `${m[3]}-${String(m[2]).padStart(2, '0')}-${String(m[1]).padStart(2, '0')}`;
+      }
       m = str.match(/^(\d{4})\/(\d{2})\/(\d{2})/);
       if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+      const parsed = new Date(str);
+      if (!Number.isNaN(parsed.getTime())) {
+        const p = getLondonParts(parsed);
+        return `${p.year}-${p.month}-${p.day}`;
+      }
       return null;
     }
 
@@ -2123,7 +2683,10 @@
     }
 
     async function getCallsForSpan(startOffset, endOffset) {
-      if (isDemoMode) return demoFortnightCalls;
+      if (isDemoMode) {
+        const labels = buildDayLabels(endOffset, endOffset - startOffset + 1);
+        return filterCallsInLabels(demoFortnightCalls, labels);
+      }
       const range = getSpanDateRange(startOffset, endOffset);
       const body = { ...range, Directions: 'INC,IU,OUT' };
       try {
@@ -2138,25 +2701,42 @@
       }
     }
 
+    function setRecorderLoading(loading) {
+      recorderHistoryLoading = loading;
+      const panel = document.getElementById('call-recorder-panel');
+      if (panel) panel.classList.toggle('recorder-loading', loading);
+      const meta = document.getElementById('recorderDataMeta');
+      if (meta && loading) meta.textContent = 'Loading last 30 days of call history…';
+    }
+
     async function getFortnightCalls(force) {
       if (isDemoMode) return demoFortnightCalls;
 
       const mergeFresh = () => mergeCallRecords(fortnightCalls, todayCalls, yesterdayCalls);
 
-      if (!force && Date.now() - lastFortnightFetchAt < FORTNIGHT_TTL_MS && fortnightCalls.length) {
+      if (!force && Date.now() - lastFortnightFetchAt < FORTNIGHT_TTL_MS && fortnightCalls.length && fortnightFetchDays >= RECORDER_MAX_DAYS) {
         return mergeFresh();
       }
 
-      let spanCalls = await getCallsForSpan(-13, 0);
-      if (spanCalls.length < 20) {
-        const older = await getCallsForSpan(-13, -7);
-        const recent = await getCallsForSpan(-6, 0);
-        spanCalls = mergeCallRecords(spanCalls, older, recent);
+      setRecorderLoading(true);
+      uiSnapshots.recorderKey = '';
+
+      const startOffset = -(RECORDER_MAX_DAYS - 1);
+      const historyEnd = -2;
+      let spanCalls = [];
+
+      // Tollring caps responses at ~1000 records — fetch week-by-week so every day is covered
+      for (let s = startOffset; s <= historyEnd; s += 7) {
+        const e = Math.min(s + 6, historyEnd);
+        spanCalls = mergeCallRecords(spanCalls, await getCallsForSpan(s, e));
       }
 
       fortnightCalls = mergeCallRecords(spanCalls, todayCalls, yesterdayCalls);
       lastFortnightFetchAt = Date.now();
-      debug('Fortnight calls loaded: ' + fortnightCalls.length);
+      fortnightFetchDays = RECORDER_MAX_DAYS;
+      setRecorderLoading(false);
+      debug('Recorder history loaded: ' + fortnightCalls.length + ' calls');
+      renderCallRecorder(true);
       return fortnightCalls;
     }
 
@@ -2181,6 +2761,7 @@
       renderLiveCalls([], true);
       renderRecentCalls([], true);
       renderMissedCalls([], [], true);
+      renderCallRecorder(true);
       renderDonutCompare(0, 0);
       renderDonutMissed(0, 0);
       document.getElementById('topPerformerName').textContent = '--';
@@ -2271,7 +2852,7 @@
 
       demoLiveCalls = generateDemoLiveCalls();
       demoFortnightCalls = [...demoTodayCalls, ...demoYesterdayCalls];
-      for (let dayOffset = -13; dayOffset <= -2; dayOffset++) {
+      for (let dayOffset = -(RECORDER_MAX_DAYS - 1); dayOffset <= -2; dayOffset++) {
         const dateStr = getLondonDateString(dayOffset);
         const dayCount = 70 + Math.floor(Math.random() * 50);
         const weights = bellCurveHourly(10);
@@ -2519,6 +3100,453 @@
         return `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7)}`;
       }
       return num;
+    }
+
+    function isInboundCall(call) {
+      const dir = normaliseDirection(call);
+      return dir === 'INC' || dir === 'IU';
+    }
+
+    function countRecorderLineCalls(calls, line) {
+      const keys = new Set(line.ddiKeys);
+      let count = 0;
+      calls.forEach(c => {
+        if (!isInboundCall(c)) return;
+        const ddi = findDdiForCall(c);
+        if (ddi && keys.has(ddi.ddi)) count++;
+      });
+      return count;
+    }
+
+    function formatRecorderDate(dateStr) {
+      if (!dateStr) return '--';
+      const parts = dateStr.split('-');
+      const dt = new Date(Date.UTC(+parts[0], +parts[1] - 1, +parts[2], 12, 0, 0));
+      return dt.toLocaleDateString('en-GB', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+        timeZone: 'Europe/London'
+      });
+    }
+
+    function recorderCell(value) {
+      const cls = value > 0 ? 'recorder-num' : 'recorder-num recorder-zero';
+      return `<td class="${cls}">${value}</td>`;
+    }
+
+    function buildRecorderData(fortnight) {
+      const merged = mergeCallRecords(fortnight || [], todayCalls || [], yesterdayCalls || []);
+      const periodDays = recorderPeriodDays;
+      const dayLabels = buildDayLabels(0, periodDays);
+      const todayStr = getLondonDateString(0);
+      const viewDate = recorderSelectedDate || todayStr;
+
+      const lineTotals = {};
+      RECORDER_LINES.forEach(line => { lineTotals[line.name] = 0; });
+
+      const dailyRows = dayLabels.map(dateStr => {
+        const dayCalls = filterCallsInLabels(merged, [dateStr]);
+        const counts = {};
+        let total = 0;
+        RECORDER_LINES.forEach(line => {
+          counts[line.name] = countRecorderLineCalls(dayCalls, line);
+          lineTotals[line.name] += counts[line.name];
+          total += counts[line.name];
+        });
+        return {
+          date: dateStr,
+          counts,
+          total,
+          isToday: dateStr === todayStr,
+          isSelected: dateStr === viewDate
+        };
+      });
+
+      const viewCounts = {};
+      RECORDER_LINES.forEach(line => {
+        viewCounts[line.name] = countRecorderLineCalls(
+          filterCallsInLabels(merged, [viewDate]),
+          line
+        );
+      });
+      const viewTotal = Object.values(viewCounts).reduce((a, b) => a + b, 0);
+      const overallTotal = dailyRows.reduce((sum, row) => sum + row.total, 0);
+
+      const loadedDayLabels = buildDayLabels(0, RECORDER_MAX_DAYS);
+      const calendarTotals = {};
+      loadedDayLabels.forEach(dateStr => {
+        const dayCalls = filterCallsInLabels(merged, [dateStr]);
+        let total = 0;
+        RECORDER_LINES.forEach(line => {
+          total += countRecorderLineCalls(dayCalls, line);
+        });
+        calendarTotals[dateStr] = total;
+      });
+
+      return {
+        lineTotals,
+        viewCounts,
+        viewTotal,
+        viewDate,
+        todayStr,
+        dailyRows,
+        overallTotal,
+        calendarTotals,
+        loadedDayLabels
+      };
+    }
+
+    function getRecorderCalendarView() {
+      if (!recorderCalendarView) {
+        const p = getLondonParts(new Date());
+        recorderCalendarView = { year: +p.year, month: +p.month };
+      }
+      return recorderCalendarView;
+    }
+
+    function setRecorderCalendarFromDate(dateStr) {
+      const [y, m] = dateStr.split('-').map(Number);
+      recorderCalendarView = { year: y, month: m };
+    }
+
+    function updateRecorderTodayBtn() {
+      const btn = document.getElementById('recorderTodayBtn');
+      if (btn) btn.classList.toggle('active', recorderSelectedDate === null);
+    }
+
+    function selectRecorderDate(dateStr) {
+      const todayStr = getLondonDateString(0);
+      recorderSelectedDate = dateStr === todayStr ? null : dateStr;
+      setRecorderCalendarFromDate(dateStr);
+      uiSnapshots.recorderKey = '';
+      updateRecorderTodayBtn();
+      renderCallRecorder(true);
+    }
+
+    function selectRecorderPeriod(days) {
+      recorderPeriodDays = days;
+      document.querySelectorAll('.recorder-period-btn').forEach(btn => {
+        btn.classList.toggle('active', +btn.dataset.days === days);
+      });
+      const periodLabel = document.getElementById('recorderPeriodLabel');
+      const trendTitle = document.getElementById('recorderTrendTitle');
+      const summaryPeriodCol = document.getElementById('recorderSummaryPeriodCol');
+      if (periodLabel) periodLabel.textContent = `Last ${days} days total`;
+      if (trendTitle) trendTitle.textContent = `Daily total — last ${days} days`;
+      if (summaryPeriodCol) summaryPeriodCol.textContent = `Total (${days} days)`;
+      uiSnapshots.recorderKey = '';
+      renderCallRecorder(true);
+    }
+
+    function getCalendarHeat(total, peak) {
+      if (!total || !peak) return 'transparent';
+      const alpha = 0.06 + (total / peak) * 0.38;
+      return `rgba(13, 119, 254, ${alpha.toFixed(2)})`;
+    }
+
+    function renderRecorderCalendar(data) {
+      const grid = document.getElementById('recorderCalendar');
+      const titleEl = document.getElementById('recorderCalTitle');
+      const nextBtn = document.getElementById('recorderCalNext');
+      if (!grid || !titleEl) return;
+
+      const view = getRecorderCalendarView();
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      titleEl.textContent = `${monthNames[view.month - 1]} ${view.year}`;
+
+      const todayStr = data.todayStr;
+      const viewDate = data.viewDate;
+      const loadedSet = new Set(data.loadedDayLabels);
+      const oldestLoaded = data.loadedDayLabels[0] || todayStr;
+      const peak = Math.max(...Object.values(data.calendarTotals), 1);
+      const nowParts = getLondonParts(new Date());
+      const isCurrentMonth = view.year === +nowParts.year && view.month === +nowParts.month;
+      if (nextBtn) nextBtn.disabled = isCurrentMonth;
+
+      const daysInMonth = new Date(Date.UTC(view.year, view.month, 0)).getUTCDate();
+      let startDow = new Date(Date.UTC(view.year, view.month - 1, 1)).getUTCDay();
+      startDow = (startDow + 6) % 7;
+
+      let html = '';
+      for (let i = 0; i < startDow; i++) {
+        html += '<div class="recorder-cal-day empty"></div>';
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const m = String(view.month).padStart(2, '0');
+        const d = String(day).padStart(2, '0');
+        const dateStr = `${view.year}-${m}-${d}`;
+        const isFuture = dateStr > todayStr;
+        const inRange = loadedSet.has(dateStr) && dateStr >= oldestLoaded;
+        const total = inRange ? (data.calendarTotals[dateStr] || 0) : null;
+        const isToday = dateStr === todayStr;
+        const isSelected = dateStr === viewDate;
+
+        let cls = 'recorder-cal-day';
+        if (isToday) cls += ' is-today';
+        if (isSelected) cls += ' selected';
+        if (!inRange || isFuture) cls += ' outside-range';
+        else if (total > 0) cls += ' has-calls';
+        else cls += ' quiet';
+
+        const disabled = isFuture || !inRange;
+        const heat = total > 0 ? getCalendarHeat(total, peak) : 'transparent';
+        const countHtml = inRange && !isFuture
+          ? `<span class="recorder-cal-day-count${total > 0 ? '' : ' zero'}">${total}</span>`
+          : '';
+
+        html += `<button type="button" class="${cls}" data-date="${dateStr}" ${disabled ? 'disabled' : ''}${isSelected || disabled ? '' : ` style="background:${heat}"`}>` +
+          `<span class="recorder-cal-day-num">${day}</span>${countHtml}</button>`;
+      }
+
+      grid.innerHTML = html;
+    }
+
+    function renderRecorderPie(viewCounts, viewTotal, centerLabel) {
+      const svg = document.getElementById('recorderPieSvg');
+      const legend = document.getElementById('recorderPieLegend');
+      if (!svg || !legend) return;
+
+      const cx = 90, cy = 90, r = 72;
+      const slices = RECORDER_LINES.map((line, idx) => ({
+        name: line.name,
+        value: viewCounts[line.name] || 0,
+        colour: getRecorderLineColour(idx)
+      })).filter(s => s.value > 0);
+
+      if (!viewTotal || !slices.length) {
+        svg.innerHTML = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#e2e8f0"/>
+          <text x="${cx}" y="${cy + 4}" text-anchor="middle" fill="#64748b" font-size="12" font-family="Inter,sans-serif">No calls</text>`;
+        legend.innerHTML = '<span class="recorder-legend-item" style="color:var(--color-text-muted)">No inbound calls on this day</span>';
+        return;
+      }
+
+      let html = '';
+      let startPct = 0;
+      slices.forEach(slice => {
+        const pct = slice.value / viewTotal;
+        const endPct = startPct + pct;
+        if (pct >= 0.999) {
+          html += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${slice.colour}"/>`;
+        } else {
+          const start = -Math.PI / 2 + startPct * 2 * Math.PI;
+          const end = -Math.PI / 2 + endPct * 2 * Math.PI;
+          const x1 = cx + r * Math.cos(start);
+          const y1 = cy + r * Math.sin(start);
+          const x2 = cx + r * Math.cos(end);
+          const y2 = cy + r * Math.sin(end);
+          const large = pct > 0.5 ? 1 : 0;
+          html += `<path d="M ${cx} ${cy} L ${x1.toFixed(1)} ${y1.toFixed(1)} A ${r} ${r} 0 ${large} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} Z" fill="${slice.colour}"/>`;
+        }
+        startPct = endPct;
+      });
+      html += `<circle cx="${cx}" cy="${cy}" r="38" fill="#ffffff"/>
+        <text x="${cx}" y="${cy - 4}" text-anchor="middle" fill="#0f172a" font-size="20" font-weight="800" font-family="Inter,sans-serif">${viewTotal}</text>
+        <text x="${cx}" y="${cy + 14}" text-anchor="middle" fill="#64748b" font-size="10" font-family="Inter,sans-serif">${centerLabel || 'calls'}</text>`;
+      svg.innerHTML = html;
+
+      legend.innerHTML = slices.map(slice => {
+        const pct = Math.round((slice.value / viewTotal) * 100);
+        return `<div class="recorder-legend-item">
+          <span class="recorder-legend-dot" style="background:${slice.colour}"></span>
+          <span>${slice.name}</span>
+          <span class="recorder-legend-pct">${pct}%</span>
+        </div>`;
+      }).join('');
+    }
+
+    function renderRecorderBars(viewCounts, viewTotal) {
+      const el = document.getElementById('recorderBars');
+      if (!el) return;
+
+      const rows = RECORDER_LINES.map((line, idx) => ({
+        name: line.name,
+        value: viewCounts[line.name] || 0,
+        colour: getRecorderLineColour(idx)
+      })).sort((a, b) => b.value - a.value);
+
+      const peak = Math.max(...rows.map(r => r.value), 1);
+      el.innerHTML = rows.map(row => {
+        const width = row.value > 0 ? Math.max((row.value / peak) * 100, 4) : 0;
+        const pct = viewTotal > 0 ? Math.round((row.value / viewTotal) * 100) : 0;
+        return `<div class="recorder-bar-row">
+          <span class="recorder-bar-label" title="${row.name}">${row.name}</span>
+          <div class="recorder-bar-track">
+            <div class="recorder-bar-fill" style="width:${width}%;background:${row.colour}"></div>
+          </div>
+          <span class="recorder-bar-value">${row.value}</span>
+          <span class="recorder-bar-pct">${pct}%</span>
+        </div>`;
+      }).join('');
+    }
+
+    function renderRecorderTrend(dailyRows, viewDate) {
+      const svg = document.getElementById('recorderTrendSvg');
+      if (!svg) return;
+
+      const W = 600, H = 140, padL = 36, padR = 12, padT = 16, padB = 28;
+      const chartW = W - padL - padR;
+      const chartH = H - padT - padB;
+      const totals = dailyRows.map(r => r.total);
+      const peak = Math.max(...totals, 1);
+      const xDiv = Math.max(dailyRows.length - 1, 1);
+
+      function pt(i, v) {
+        return {
+          x: padL + (i / xDiv) * chartW,
+          y: padT + chartH - (v / peak) * chartH,
+          v
+        };
+      }
+
+      const points = dailyRows.map((r, i) => pt(i, r.total));
+      const line = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+      const area = line + ` L${points[points.length - 1].x.toFixed(1)},${padT + chartH} L${points[0].x.toFixed(1)},${padT + chartH} Z`;
+
+      let html = `<defs>
+        <linearGradient id="recorderTrendGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0d77fe" stop-opacity="0.2"/>
+          <stop offset="100%" stop-color="#0d77fe" stop-opacity="0.02"/>
+        </linearGradient>
+      </defs>`;
+
+      [0, Math.ceil(peak / 2), peak].filter((v, i, a) => a.indexOf(v) === i).forEach(val => {
+        const y = padT + chartH - (val / peak) * chartH;
+        html += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#e2e8f0" stroke-width="0.5"/>`;
+        html += `<text x="${padL - 4}" y="${y + 3}" fill="#64748b" font-size="9" text-anchor="end" font-family="Inter,sans-serif">${val}</text>`;
+      });
+
+      dailyRows.forEach((row, i) => {
+        if (dailyRows.length > 14 && i % 2 !== 0 && i !== dailyRows.length - 1) return;
+        const x = padL + (i / xDiv) * chartW;
+        const parts = row.date.split('-');
+        const label = row.isSelected ? 'Selected' : (row.isToday ? 'Today' : `${parts[2]}/${parts[1]}`);
+        html += `<text x="${x}" y="${H - 6}" fill="#64748b" font-size="8" text-anchor="middle" font-family="Inter,sans-serif">${label}</text>`;
+      });
+
+      html += `<path d="${area}" fill="url(#recorderTrendGrad)"/>`;
+      html += `<path d="${line}" fill="none" stroke="#0d77fe" stroke-width="2.5" stroke-linejoin="round"/>`;
+      points.forEach((p, i) => {
+        const row = dailyRows[i];
+        const isHighlight = row.date === viewDate;
+        const fill = isHighlight ? '#0d77fe' : '#fff';
+        const stroke = '#0d77fe';
+        const r = isHighlight ? 5 : 3.5;
+        html += `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r + 8}" fill="transparent" class="recorder-trend-hit" data-date="${row.date}" style="cursor:pointer"/>`;
+        html += `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="1.5" pointer-events="none"/>`;
+      });
+
+      svg.innerHTML = html;
+      svg.onclick = e => {
+        const hit = e.target.closest('[data-date]');
+        if (hit && hit.dataset.date) selectRecorderDate(hit.dataset.date);
+      };
+    }
+
+    function renderCallRecorder(force) {
+      const data = buildRecorderData(isDemoMode ? demoFortnightCalls : fortnightCalls);
+      const calView = getRecorderCalendarView();
+      const key = data.dailyRows.map(r =>
+        `${r.date}:${RECORDER_LINES.map(l => r.counts[l.name]).join(',')}:${r.total}`
+      ).join('|') + '::' + data.overallTotal + '::' + data.viewTotal + '::' + data.viewDate
+        + '::' + recorderPeriodDays + '::' + calView.year + '-' + calView.month;
+      if (!force && key === uiSnapshots.recorderKey) return;
+      uiSnapshots.recorderKey = key;
+
+      const viewEl = document.getElementById('recorderViewTotal');
+      const periodEl = document.getElementById('recorderPeriodTotal');
+      const topEl = document.getElementById('recorderTopLine');
+      const viewLabelEl = document.getElementById('recorderViewLabel');
+      const topLabelEl = document.getElementById('recorderTopLabel');
+      const selectedNoteEl = document.getElementById('recorderSelectedNote');
+      const summaryDayCol = document.getElementById('recorderSummaryDayCol');
+      const pieTitle = document.getElementById('recorderPieTitle');
+      const barsTitle = document.getElementById('recorderBarsTitle');
+
+      const isToday = data.viewDate === data.todayStr;
+      const dateLabel = isToday ? 'today' : formatRecorderDate(data.viewDate);
+      const shortDate = isToday ? 'Today' : formatRecorderDate(data.viewDate);
+
+      if (viewEl) viewEl.textContent = data.viewTotal;
+      if (periodEl) periodEl.textContent = data.overallTotal;
+      if (viewLabelEl) viewLabelEl.textContent = isToday ? 'Inbound calls today' : `Inbound on ${dateLabel}`;
+      if (selectedNoteEl) {
+        selectedNoteEl.textContent = isToday
+          ? 'Showing today — pick another day on the calendar'
+          : `Showing ${formatRecorderDate(data.viewDate)}`;
+      }
+      if (summaryDayCol) summaryDayCol.textContent = shortDate;
+      if (pieTitle) pieTitle.textContent = isToday ? "Today's share by line" : `Share on ${dateLabel}`;
+      if (barsTitle) barsTitle.textContent = isToday ? 'Calls today by line' : `Calls on ${dateLabel}`;
+
+      const metaEl = document.getElementById('recorderDataMeta');
+      if (metaEl) {
+        if (recorderHistoryLoading) {
+          metaEl.textContent = 'Loading last 30 days of call history…';
+        } else {
+          const mins = lastFortnightFetchAt ? Math.round((Date.now() - lastFortnightFetchAt) / 60000) : null;
+          const daysWithCalls = data.loadedDayLabels.filter(d => (data.calendarTotals[d] || 0) > 0).length;
+          metaEl.textContent = mins === null
+            ? `Inbound calls by line · ${RECORDER_MAX_DAYS}-day history`
+            : `Inbound calls by line · ${daysWithCalls} active days in last ${recorderPeriodDays} · updated ${mins < 1 ? 'just now' : mins + ' min ago'}`;
+        }
+      }
+
+      let topLine = '--';
+      let topCount = 0;
+      RECORDER_LINES.forEach(line => {
+        const c = data.viewCounts[line.name] || 0;
+        if (c > topCount) { topCount = c; topLine = line.name; }
+      });
+      if (topEl) topEl.textContent = topCount > 0 ? topLine : 'None';
+      if (topLabelEl) topLabelEl.textContent = isToday ? 'Busiest line today' : 'Busiest line that day';
+
+      const pieCenter = isToday ? 'today' : 'calls';
+      renderRecorderPie(data.viewCounts, data.viewTotal, pieCenter);
+      renderRecorderBars(data.viewCounts, data.viewTotal);
+      renderRecorderTrend(data.dailyRows, data.viewDate);
+      renderRecorderCalendar(data);
+      updateRecorderTodayBtn();
+
+      const summaryBody = document.getElementById('recorderSummaryBody');
+      if (summaryBody) {
+        summaryBody.innerHTML = RECORDER_LINES.map(line => {
+          const dayCount = data.viewCounts[line.name] || 0;
+          const total = data.lineTotals[line.name] || 0;
+          return `<tr>
+            <td class="recorder-text-col"><strong>${line.name}</strong></td>
+            <td class="recorder-text-col">${formatPhoneDisplay(line.number)}</td>
+            <td class="recorder-num recorder-today">${dayCount}</td>
+            <td class="recorder-num">${total}</td>
+          </tr>`;
+        }).join('');
+      }
+
+      const dailyHead = document.getElementById('recorderDailyHead');
+      const dailyBody = document.getElementById('recorderDailyBody');
+      if (dailyHead && dailyBody) {
+        dailyHead.innerHTML = `<tr>
+          <th class="recorder-text-col">Date</th>
+          ${RECORDER_LINES.map(l => `<th>${l.name}</th>`).join('')}
+          <th>Daily total</th>
+        </tr>`;
+
+        const rows = [...data.dailyRows].reverse();
+        dailyBody.innerHTML = rows.map(row => {
+          const rowClass = row.isSelected ? ' class="recorder-row-today recorder-daily-row-clickable"' : ' class="recorder-daily-row-clickable"';
+          const cells = RECORDER_LINES.map(l => recorderCell(row.counts[l.name] || 0)).join('');
+          const totalCell = `<td class="recorder-num recorder-daily-total">${row.total}</td>`;
+          let dateLabelRow = formatRecorderDate(row.date);
+          if (row.isToday) dateLabelRow += ' (today)';
+          if (row.isSelected && !row.isToday) dateLabelRow += ' (selected)';
+          return `<tr${rowClass} data-date="${row.date}">
+            <td class="recorder-text-col">${dateLabelRow}</td>
+            ${cells}
+            ${totalCell}
+          </tr>`;
+        }).join('');
+      }
     }
 
     function getMissedCallsList(calls) {
@@ -3171,6 +4199,7 @@
       renderChart(force);
       renderRecentCalls(today, force);
       renderMissedCalls(today, yesterday, force);
+      renderCallRecorder(force);
       renderTicker(force);
     }
 
@@ -3264,6 +4293,54 @@
       if (chartSelectedDdis.has(ddi)) chartSelectedDdis.delete(ddi);
       else chartSelectedDdis.add(ddi);
       renderChart(true);
+    });
+
+    document.getElementById('recorderPeriodBtns').addEventListener('click', e => {
+      const btn = e.target.closest('.recorder-period-btn');
+      if (!btn) return;
+      selectRecorderPeriod(+btn.dataset.days);
+    });
+
+    document.getElementById('recorderTodayBtn').addEventListener('click', () => {
+      recorderSelectedDate = null;
+      const p = getLondonParts(new Date());
+      recorderCalendarView = { year: +p.year, month: +p.month };
+      uiSnapshots.recorderKey = '';
+      updateRecorderTodayBtn();
+      renderCallRecorder(true);
+    });
+
+    document.getElementById('recorderCalPrev').addEventListener('click', () => {
+      const view = getRecorderCalendarView();
+      let month = view.month - 1;
+      let year = view.year;
+      if (month < 1) { month = 12; year--; }
+      recorderCalendarView = { year, month };
+      uiSnapshots.recorderKey = '';
+      renderCallRecorder(true);
+    });
+
+    document.getElementById('recorderCalNext').addEventListener('click', () => {
+      const view = getRecorderCalendarView();
+      const nowParts = getLondonParts(new Date());
+      if (view.year === +nowParts.year && view.month === +nowParts.month) return;
+      let month = view.month + 1;
+      let year = view.year;
+      if (month > 12) { month = 1; year++; }
+      recorderCalendarView = { year, month };
+      uiSnapshots.recorderKey = '';
+      renderCallRecorder(true);
+    });
+
+    document.getElementById('recorderCalendar').addEventListener('click', e => {
+      const btn = e.target.closest('.recorder-cal-day[data-date]');
+      if (!btn || btn.disabled) return;
+      selectRecorderDate(btn.dataset.date);
+    });
+
+    document.getElementById('recorderDailyBody').addEventListener('click', e => {
+      const tr = e.target.closest('tr[data-date]');
+      if (tr) selectRecorderDate(tr.dataset.date);
     });
 
     // ============================================================
