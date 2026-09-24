@@ -26,53 +26,6 @@
 
 The dashboard calls `/api/tollring?path=GetLiveCalls` (and other paths). The Netlify function forwards requests to the 4com iCall Suite API with credentials from environment variables.
 
-## Weekend missed-call reports
+## Weekend missed calls
 
-The dashboard includes a **Weekend Missed Calls** panel:
-
-- **Last weekend** — previous Sat–Sun
-- **This weekend** — Sat–Sun so far
-- **Extended (bank hol.)** — adds Fri/Mon when UK bank holidays touch the weekend
-- **Custom dates** — pick any range
-- **Callback status** — tracked in your browser (Not contacted, Called back, etc.)
-- **Download CSV** — export for Monday follow-up
-
-### Automatic Monday email
-
-A scheduled Netlify function runs **every Monday at 07:00 UTC** (`weekend-missed-report`).
-
-Configure in Netlify environment variables:
-
-| Variable | Purpose |
-|---|---|
-| `REPORT_EMAIL_FROM` | Sender address (must be verified in Resend) |
-| `REPORT_EMAIL_TO` | Comma-separated recipients |
-| `RESEND_API_KEY` | [Resend](https://resend.com) API key |
-
-Optional:
-
-| Variable | Purpose |
-|---|---|
-| `SLACK_WEBHOOK_URL` or `TEAMS_WEBHOOK_URL` | Post summary notification |
-| `GOOGLE_SHEET_WEBHOOK_URL` | Append rows via Google Apps Script (see `google-apps-script-weekend-sheet.js`) |
-| `WEEKEND_REPORT_SECRET` | Bearer token to protect manual `/api/weekend-missed` calls |
-
-### Manual API
-
-```bash
-curl -X POST https://your-site.netlify.app/api/weekend-missed \
-  -H "Content-Type: application/json" \
-  -d '{"preset":"last-weekend","deliver":true}'
-```
-
-CSV download:
-
-```bash
-curl "https://your-site.netlify.app/api/weekend-missed?preset=last-weekend&format=csv" -o weekend-missed.csv
-```
-
-### Google Sheet logging
-
-1. Create a sheet with headers: Date, Time, Line, Garage, Caller, Ring time, Queue, Callback status, Report range, Generated at
-2. Deploy `google-apps-script-weekend-sheet.js` as a web app
-3. Set `GOOGLE_SHEET_WEBHOOK_URL` to the deployment URL
+Use the **Weekend Missed Calls** panel to load Sat–Sun (or a custom range), tick off callbacks, then click **Print / Save PDF**. Choose “Save as PDF” in the print dialog for a file you can email or file away.
