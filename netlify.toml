@@ -11,3 +11,11 @@
   from = "/api/tollring/*"
   to   = "/.netlify/functions/tollring"
   status = 200
+
+[[redirects]]
+  from = "/api/weekend-missed"
+  to   = "/.netlify/functions/weekend-missed-report"
+  status = 200
+
+[functions."weekend-missed-report"]
+  schedule = "0 7 * * 1"

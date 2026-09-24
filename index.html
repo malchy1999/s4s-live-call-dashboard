@@ -242,6 +242,7 @@
       transition: color var(--transition-base);
     }
     .last-updated.fresh { color: var(--color-success); }
+    .last-updated.stale { color: var(--color-warning); }
 
     .demo-badge {
       display: none;
@@ -1419,6 +1420,106 @@
       font-family: var(--font-mono);
       color: var(--color-danger);
     }
+    .weekend-panel { margin-top: var(--space-4); }
+    .weekend-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: var(--space-3);
+    }
+    .weekend-preset-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+    .weekend-preset-btn,
+    .weekend-action-btn {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--color-bg-border);
+      background: var(--color-bg-subtle);
+      color: var(--color-text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .weekend-preset-btn:hover,
+    .weekend-action-btn:hover {
+      border-color: var(--color-brand-primary);
+      color: var(--color-brand-primary);
+    }
+    .weekend-preset-btn.active {
+      background: var(--color-danger-dim);
+      border-color: #ff475740;
+      color: var(--color-danger);
+    }
+    .weekend-action-btn.primary {
+      background: var(--color-brand-primary);
+      border-color: var(--color-brand-primary);
+      color: #fff;
+    }
+    .weekend-date-inputs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .weekend-date-inputs input[type="date"] {
+      padding: 6px 10px;
+      border: 1px solid var(--color-bg-border);
+      border-radius: 8px;
+      font-size: 12px;
+      font-family: var(--font-sans);
+    }
+    .weekend-meta {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-3);
+    }
+    .weekend-summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: var(--space-4);
+    }
+    .weekend-summary-stat {
+      background: var(--color-bg-subtle);
+      border: 1px solid var(--color-bg-border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      text-align: center;
+    }
+    .weekend-summary-val {
+      display: block;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--color-danger);
+      line-height: 1.1;
+    }
+    .weekend-summary-label {
+      display: block;
+      font-size: 11px;
+      color: var(--color-text-muted);
+      margin-top: 4px;
+    }
+    .weekend-line-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: var(--space-3);
+    }
+    .weekend-status-select {
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--color-bg-border);
+      font-size: 11px;
+      font-family: var(--font-sans);
+      background: #fff;
+      min-width: 120px;
+    }
+    .weekend-panel.loading .weekend-table-wrap { opacity: 0.5; pointer-events: none; }
+    @media (max-width: 900px) {
+      .weekend-summary { grid-template-columns: repeat(2, 1fr); }
+    }
     .dir-icon {
       display: inline-flex;
       align-items: center;
@@ -2134,6 +2235,70 @@
               </table>
               </div>
             </div>
+
+            <div class="card card-enter weekend-panel" id="weekend-missed-panel" style="animation-delay:600ms">
+              <div class="card-header">
+                <div>
+                  <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Weekend Missed Calls</div>
+                  <p class="card-desc">Pull every inbound unanswered call from Sat–Sun (or extended bank-holiday weekends). Track callbacks and export for Monday follow-up.</p>
+                </div>
+                <span class="card-badge" id="weekendMissedCount">--</span>
+              </div>
+
+              <div class="weekend-toolbar">
+                <div class="weekend-preset-btns" id="weekendPresetBtns">
+                  <button type="button" class="weekend-preset-btn active" data-preset="last-weekend">Last weekend</button>
+                  <button type="button" class="weekend-preset-btn" data-preset="this-weekend">This weekend</button>
+                  <button type="button" class="weekend-preset-btn" data-preset="extended-last">Extended (bank hol.)</button>
+                  <button type="button" class="weekend-preset-btn" data-preset="custom">Custom dates</button>
+                </div>
+                <div class="weekend-date-inputs" id="weekendCustomDates" hidden>
+                  <input type="date" id="weekendDateStart" aria-label="Start date">
+                  <span>to</span>
+                  <input type="date" id="weekendDateEnd" aria-label="End date">
+                </div>
+                <button type="button" class="weekend-action-btn primary" id="weekendLoadBtn">Load report</button>
+                <button type="button" class="weekend-action-btn" id="weekendCsvBtn">Download CSV</button>
+                <button type="button" class="weekend-action-btn" id="weekendEmailBtn">Email report</button>
+              </div>
+
+              <p class="weekend-meta" id="weekendMeta">Choose a range and click Load report. Monday emails run automatically at 7:00 UK time when configured.</p>
+              <div class="weekend-summary">
+                <div class="weekend-summary-stat">
+                  <span class="weekend-summary-val" id="weekendTotalVal">--</span>
+                  <span class="weekend-summary-label">Total missed</span>
+                </div>
+                <div class="weekend-summary-stat">
+                  <span class="weekend-summary-val" id="weekendSatVal">--</span>
+                  <span class="weekend-summary-label">Saturday</span>
+                </div>
+                <div class="weekend-summary-stat">
+                  <span class="weekend-summary-val" id="weekendSunVal">--</span>
+                  <span class="weekend-summary-label">Sunday</span>
+                </div>
+                <div class="weekend-summary-stat">
+                  <span class="weekend-summary-val weekend-summary-name" id="weekendTopLineVal">--</span>
+                  <span class="weekend-summary-label">Busiest line</span>
+                </div>
+              </div>
+              <div class="weekend-line-pills" id="weekendLinePills"></div>
+              <div class="table-scroll weekend-table-wrap">
+                <table class="recent-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Time</th>
+                      <th>Line</th>
+                      <th>Garage</th>
+                      <th>Caller</th>
+                      <th>Rang for</th>
+                      <th>Callback status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="weekendMissedBody"></tbody>
+                </table>
+              </div>
+            </div>
           </div>
 
           <div class="panel-right">
@@ -2343,6 +2508,8 @@
     const HISTORY_PAGE_SIZE = 250;
     const CALL_ARCHIVE_DB = 's4s-call-archive';
     const CALL_ARCHIVE_STORE = 'calls';
+    const SNAPSHOT_KEY = 's4s-dashboard-snapshot-v1';
+    let showingCachedNumbers = false;
     let ddiStatuses = {};
     let tickerEvents = [];
     let prevKpiValues = {};
@@ -2360,6 +2527,29 @@
     let recorderSelectedDate = null;
     let recorderCalendarView = null;
     let recorderHistoryLoading = false;
+    let weekendPreset = 'last-weekend';
+    let weekendMissedRows = [];
+    let weekendRangeLabel = '';
+    let weekendLoading = false;
+    let bankHolidayDates = new Set();
+    let bankHolidayLoadedAt = 0;
+    const WEEKEND_CALLBACK_KEY = 's4s-weekend-callback-status-v1';
+    const WEEKEND_CALLBACK_OPTIONS = ['Not contacted', 'Called back', 'Voicemail', 'Booked', 'No answer'];
+    const RECORDER_LINE_NAMES = {
+      '+441932503647-gearbox': 'Main',
+      '+441932503647-existing': 'Main',
+      '+441932503647-garages24': 'Main',
+      '+441932503647-customer24': 'Main',
+      '+441932503647-night': 'Main',
+      '+441767669575': 'A1',
+      '+441582320570': 'Beds',
+      '+441616740142': 'Manchester',
+      '+441174567065': 'Bristol',
+      '+441133231775': 'Leeds',
+      '+441580239610': 'South East',
+      '+441922666376': 'Midlands',
+      '+442039056741': 'London'
+    };
     let chartDataCache = null;
     let chartPeriod = 'today';
     const chartSelectedDdis = new Set();
@@ -2536,6 +2726,110 @@
         if (historyModalOpen) renderCallHistory(true);
       }
       return added;
+    }
+
+    function callsForLondonDate(calls, dateStr) {
+      return (calls || []).filter(c => getCallDate(getCallDateField(c)) === dateStr);
+    }
+
+    function hasCachedNumbers() {
+      return showingCachedNumbers || todayCalls.length > 0 || yesterdayCalls.length > 0 || archivedCalls.length > 0;
+    }
+
+    function hydrateCallsFromArchive() {
+      const all = archivedCalls.length ? archivedCalls : fortnightCalls;
+      if (!all.length) return false;
+      const todayStr = getLondonDateString(0);
+      const yestStr = getLondonDateString(-1);
+      if (!todayCalls.length) todayCalls = callsForLondonDate(all, todayStr);
+      if (!yesterdayCalls.length) yesterdayCalls = callsForLondonDate(all, yestStr);
+      if (!fortnightCalls.length) fortnightCalls = all.slice();
+      showingCachedNumbers = true;
+      return true;
+    }
+
+    function saveDashboardSnapshot() {
+      if (isDemoMode) return;
+      try {
+        const t = processCallsData(todayCalls);
+        const y = processYesterdayCounts(yesterdayCalls);
+        localStorage.setItem(SNAPSHOT_KEY, JSON.stringify({
+          savedAt: Date.now(),
+          savedDate: getLondonDateString(0),
+          liveCount: Array.isArray(liveCalls) ? liveCalls.length : 0,
+          inbound: t.inbound,
+          outbound: t.outbound,
+          answered: t.answered,
+          missed: t.missed,
+          avgRing: t.avgRing,
+          answerRate: t.answerRate,
+          missedRate: t.missedRate,
+          yInbound: y.inbound,
+          yOutbound: y.outbound,
+          yAnswered: y.answered,
+          yMissed: y.missed,
+          yAvgRing: y.avgRing,
+          ddiCounts: t.ddiCounts,
+          yDdiCounts: y.ddiCounts,
+          lastFortnightFetchAt,
+          fortnightFetchDays
+        }));
+      } catch (e) {
+        debug('Snapshot save failed: ' + (e && e.message ? e.message : e));
+      }
+    }
+
+    function applyDashboardSnapshot() {
+      if (isDemoMode || DEMO_MODE) return null;
+      let s;
+      try {
+        s = JSON.parse(localStorage.getItem(SNAPSHOT_KEY) || 'null');
+      } catch (e) {
+        return null;
+      }
+      if (!s || typeof s !== 'object') return null;
+
+      if (typeof s.lastFortnightFetchAt === 'number') lastFortnightFetchAt = s.lastFortnightFetchAt;
+      if (s.fortnightFetchDays) fortnightFetchDays = s.fortnightFetchDays;
+
+      const sameDay = s.savedDate === getLondonDateString(0);
+      if (sameDay) {
+        showingCachedNumbers = true;
+        const inboundPct = pctChange(s.inbound || 0, s.yInbound || 0);
+        setKpiValue('kpiInboundVal', s.inbound || 0, 'kpiInboundSub', formatPct(inboundPct), inboundPct >= 0 ? 'up' : 'down');
+        const outboundPct = pctChange(s.outbound || 0, s.yOutbound || 0);
+        setKpiValue('kpiOutboundVal', s.outbound || 0, 'kpiOutboundSub', formatPct(outboundPct), outboundPct >= 0 ? 'up' : 'down');
+        setKpiValue('kpiAnsweredVal', s.answered || 0, 'kpiAnsweredSub',
+          `${s.answerRate || 0}% answer rate`, pctChange(s.answered || 0, s.yAnswered || 0) >= 0 ? 'up' : 'down');
+        setKpiValue('kpiMissedVal', s.missed || 0, 'kpiMissedSub',
+          `${s.missedRate || 0}% of inbound (excl. outbound)`, '');
+        const avgStr = formatTime(s.avgRing || 0);
+        const avgEl = document.getElementById('kpiAvgRtVal');
+        if (avgEl) avgEl.textContent = avgStr;
+        const avgSub = document.getElementById('kpiAvgRtSub');
+        if (avgSub) {
+          const goalHtml = (s.avgRing || 0) <= 20 ? ' <span class="goal-badge">Under 20s goal</span>' : '';
+          avgSub.innerHTML = formatPct(pctChange(Math.round(s.avgRing || 0), Math.round(s.yAvgRing || 0))) + goalHtml;
+        }
+        renderDonutCompare(s.inbound || 0, s.yInbound || 0);
+        renderDonutMissed(s.missed || 0, s.answered || 0);
+        if (s.ddiCounts) updateDdiTableCounts(s.ddiCounts, s.yDdiCounts || {}, true);
+        renderTopPerformer(s.ddiCounts || {}, s.yDdiCounts || {});
+        updateLiveKpi(s.liveCount || 0, true);
+        const liveSub = document.getElementById('kpiLiveSub');
+        if (liveSub) liveSub.textContent = 'Last known · refreshing';
+      }
+
+      if (s.savedAt) {
+        const p = getLondonParts(new Date(s.savedAt));
+        const el = document.getElementById('lastUpdated');
+        if (el) {
+          el.textContent = `Showing last numbers · ${p.hour}:${p.minute}:${p.second} · refreshing...`;
+          el.classList.remove('fresh');
+          el.classList.add('stale');
+        }
+      }
+      return s;
     }
 
     // ============================================================
@@ -2899,7 +3193,7 @@
         const msg = err.message.slice(7);
         showError(msg);
         showSetupPanel(msg);
-        renderEmptyDashboard();
+        if (!hasCachedNumbers()) renderEmptyDashboard();
         return true;
       }
       if (err.message.startsWith('RATE_LIMIT:')) {
@@ -2911,7 +3205,7 @@
         const msg = err.message.startsWith('AUTH_FAILED:')
           ? err.message.slice('AUTH_FAILED:'.length)
           : 'Tollring rejected the credentials. Check TOLLRING_USERNAME and TOLLRING_TOKEN in your environment variables.';
-        if (hasConnectedOnce) {
+        if (hasConnectedOnce || hasCachedNumbers()) {
           showError('Temporary API auth issue — keeping last data. Will retry automatically.');
           debug('Auth error after successful connection (likely rate limit): ' + msg);
           return true;
@@ -2925,7 +3219,7 @@
         showError('Tollring API error: ' + err.message.slice(10));
         return true;
       }
-      if (hasConnectedOnce) {
+      if (hasConnectedOnce || hasCachedNumbers()) {
         showError('Could not refresh call data. Will retry on next poll.');
         return true;
       }
@@ -2943,7 +3237,8 @@
         return tollringRecords(data);
       } catch (e) {
         handleApiFailure('GetLiveCalls', e);
-        return tollringRecords(lastKnownData.live);
+        const cached = tollringRecords(lastKnownData.live);
+        return cached.length ? cached : (liveCalls || []);
       }
     }
 
@@ -2964,7 +3259,9 @@
       } catch (e) {
         handleApiFailure('GetCallsByDate', e);
         const cached = offsetDays === -1 ? lastKnownData.yesterday : lastKnownData.today;
-        return tollringRecords(cached);
+        const records = tollringRecords(cached);
+        if (records.length) return records;
+        return offsetDays === -1 ? yesterdayCalls : todayCalls;
       }
     }
 
@@ -2983,16 +3280,22 @@
         return tollringRecords(data);
       } catch (e) {
         handleApiFailure('GetCallsByDate span', e);
-        return tollringRecords(lastKnownData.fortnight);
+        const cached = tollringRecords(lastKnownData.fortnight);
+        return cached.length ? cached : [];
       }
     }
 
     function setRecorderLoading(loading) {
       recorderHistoryLoading = loading;
       const panel = document.getElementById('call-recorder-panel');
-      if (panel) panel.classList.toggle('recorder-loading', loading);
+      const hasExisting = (fortnightCalls && fortnightCalls.length) || (archivedCalls && archivedCalls.length);
+      if (panel) panel.classList.toggle('recorder-loading', loading && !hasExisting);
       const meta = document.getElementById('recorderDataMeta');
-      if (meta && loading) meta.textContent = 'Loading and storing call history…';
+      if (meta && loading) {
+        meta.textContent = hasExisting
+          ? 'Updating history in background…'
+          : 'Loading and storing call history…';
+      }
     }
 
     async function getFortnightCalls(force) {
@@ -3008,8 +3311,9 @@
         return mergeFresh();
       }
 
+      const hasExisting = (fortnightCalls && fortnightCalls.length) || (archivedCalls && archivedCalls.length);
       setRecorderLoading(true);
-      uiSnapshots.recorderKey = '';
+      if (!hasExisting) uiSnapshots.recorderKey = '';
 
       const startOffset = -(RECORDER_MAX_DAYS - 1);
       const historyEnd = -2;
@@ -3789,7 +4093,10 @@
       const metaEl = document.getElementById('recorderDataMeta');
       if (metaEl) {
         if (recorderHistoryLoading) {
-          metaEl.textContent = 'Loading and storing call history…';
+          const hasExisting = (fortnightCalls && fortnightCalls.length) || (archivedCalls && archivedCalls.length);
+          metaEl.textContent = hasExisting
+            ? 'Updating history in background…'
+            : 'Loading and storing call history…';
         } else {
           const mins = lastFortnightFetchAt ? Math.round((Date.now() - lastFortnightFetchAt) / 60000) : null;
           const daysWithCalls = data.loadedDayLabels.filter(d => (data.calendarTotals[d] || 0) > 0).length;
@@ -3870,13 +4177,315 @@
       return Object.entries(counts).sort((a, b) => b[1] - a[1]);
     }
 
-    function updateLastUpdated() {
+    function getRecorderLineName(ddi) {
+      if (!ddi) return 'Unknown';
+      return RECORDER_LINE_NAMES[ddi.ddi] || ddi.name;
+    }
+
+    function loadWeekendCallbackStatuses() {
+      try {
+        return JSON.parse(localStorage.getItem(WEEKEND_CALLBACK_KEY) || '{}') || {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveWeekendCallbackStatus(key, status) {
+      const map = loadWeekendCallbackStatuses();
+      if (status) map[key] = status;
+      else delete map[key];
+      localStorage.setItem(WEEKEND_CALLBACK_KEY, JSON.stringify(map));
+    }
+
+    function londonWeekday(dateStr) {
+      const parts = dateStr.split('-').map(Number);
+      return new Date(Date.UTC(parts[0], parts[1] - 1, parts[2])).getUTCDay();
+    }
+
+    function offsetFromDateString(dateStr, dayOffset) {
+      const parts = dateStr.split('-').map(Number);
+      const shifted = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2] + dayOffset, 12, 0, 0));
+      const sp = getLondonParts(shifted);
+      return `${sp.year}-${sp.month}-${sp.day}`;
+    }
+
+    async function loadBankHolidayDatesClient() {
+      if (Date.now() - bankHolidayLoadedAt < 86400000 && bankHolidayDates.size) {
+        return bankHolidayDates;
+      }
+      try {
+        const res = await fetch('https://www.gov.uk/bank-holidays.json');
+        if (res.ok) {
+          const data = await res.json();
+          const dates = new Set();
+          ['england-and-wales', 'scotland', 'northern-ireland'].forEach(region => {
+            (data[region] && data[region].events || []).forEach(ev => {
+              if (ev && ev.date) dates.add(ev.date);
+            });
+          });
+          bankHolidayDates = dates;
+          bankHolidayLoadedAt = Date.now();
+          return dates;
+        }
+      } catch (e) { /* fall through */ }
+      bankHolidayDates = new Set(['2025-12-25', '2025-12-26', '2026-01-01', '2026-04-03', '2026-04-06', '2026-05-04', '2026-05-25', '2026-08-31', '2026-12-25', '2026-12-28']);
+      bankHolidayLoadedAt = Date.now();
+      return bankHolidayDates;
+    }
+
+    async function getWeekendDateRangeClient(preset, customStart, customEnd) {
+      const bankHolidays = await loadBankHolidayDatesClient();
+      const today = getLondonDateString(0);
+      const dow = londonWeekday(today);
+
+      if (preset === 'custom' && customStart && customEnd) {
+        const dates = [];
+        let cur = customStart;
+        while (cur <= customEnd) {
+          dates.push(cur);
+          cur = offsetFromDateString(cur, 1);
+        }
+        return { dates, label: `Custom (${customStart} to ${customEnd})` };
+      }
+
+      if (preset === 'this-weekend') {
+        const satOffset = dow === 6 ? 0 : dow === 0 ? -1 : (6 - dow);
+        const dates = [];
+        const sat = getLondonDateString(satOffset);
+        const sun = getLondonDateString(satOffset + 1);
+        if (sat <= today) dates.push(sat);
+        if (sun <= today) dates.push(sun);
+        if (!dates.length) dates.push(sat, sun);
+        return { dates: [...new Set(dates)].sort(), label: 'This weekend so far' };
+      }
+
+      const sunOffset = dow === 0 ? -7 : -dow;
+      const satOffset = sunOffset - 1;
+      let dates = [getLondonDateString(satOffset), getLondonDateString(sunOffset)];
+
+      if (preset === 'extended-last') {
+        const fri = offsetFromDateString(dates[0], -1);
+        const mon = offsetFromDateString(dates[1], 1);
+        if (bankHolidays.has(mon) || bankHolidays.has(fri) || bankHolidays.has(dates[0]) || bankHolidays.has(dates[1])) {
+          dates = [fri, ...dates, mon];
+        }
+      }
+
+      return { dates: [...new Set(dates)].sort(), label: preset === 'extended-last' ? 'Last extended weekend' : 'Last weekend' };
+    }
+
+    function dateStringToOffset(dateStr) {
+      const today = getLondonDateString(0);
+      const tp = today.split('-').map(Number);
+      const dp = dateStr.split('-').map(Number);
+      const tUtc = Date.UTC(tp[0], tp[1] - 1, tp[2]);
+      const dUtc = Date.UTC(dp[0], dp[1] - 1, dp[2]);
+      return Math.round((dUtc - tUtc) / 86400000);
+    }
+
+    function buildWeekendMissedRows(calls) {
+      const statuses = loadWeekendCallbackStatuses();
+      return getMissedCallsList(calls).map(c => {
+        const ddi = findDdiForCall(c);
+        const dateStr = getCallDate(getCallDateField(c)) || '';
+        const timeMatch = String(c.Call_date || '').match(/(\d{2}:\d{2}:\d{2}|\d{2}:\d{2})/);
+        const key = callRecordKey(c);
+        return {
+          key,
+          date: dateStr,
+          dateLabel: dateStr ? formatRecorderDate(dateStr) : '--',
+          time: timeMatch ? timeMatch[1] : '--:--',
+          line: getRecorderLineName(ddi),
+          garage: ddi ? ddi.name : 'Unknown',
+          caller: formatPhoneDisplay(formatCallerId(c)),
+          ringTime: c.Ring_time > 0 ? formatTime(c.Ring_time) : '0:00',
+          queue: c.DDIOrGroup || c.Group_no || '',
+          status: statuses[key] || 'Not contacted'
+        };
+      }).sort((a, b) => `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`));
+    }
+
+    async function fetchWeekendMissedCallsForDates(dates) {
+      let all = [];
+      for (const dateStr of dates) {
+        const offset = dateStringToOffset(dateStr);
+        const dayCalls = await getCallsForSpan(offset, offset);
+        all = mergeCallRecords(all, dayCalls);
+      }
+      return all;
+    }
+
+    function summariseWeekendByLine(rows) {
+      const counts = {};
+      rows.forEach(r => { counts[r.line] = (counts[r.line] || 0) + 1; });
+      return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    }
+
+    function downloadWeekendCsv() {
+      if (!weekendMissedRows.length) {
+        showToast('Load a weekend report first');
+        return;
+      }
+      const header = ['Date', 'Time', 'Line', 'Garage', 'Caller', 'Ring time', 'Queue', 'Callback status'];
+      const csvRows = [header.join(',')];
+      weekendMissedRows.forEach(r => {
+        const vals = [r.date, r.time, r.line, r.garage, r.caller, r.ringTime, r.queue, r.status]
+          .map(v => `"${String(v || '').replace(/"/g, '""')}"`);
+        csvRows.push(vals.join(','));
+      });
+      const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const first = weekendMissedRows[weekendMissedRows.length - 1]?.date || getLondonDateString(0);
+      const last = weekendMissedRows[0]?.date || getLondonDateString(0);
+      a.download = `s4s-missed-weekend-${first}_${last}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function renderWeekendMissedPanel() {
+      const countEl = document.getElementById('weekendMissedCount');
+      const metaEl = document.getElementById('weekendMeta');
+      const totalEl = document.getElementById('weekendTotalVal');
+      const satEl = document.getElementById('weekendSatVal');
+      const sunEl = document.getElementById('weekendSunVal');
+      const topEl = document.getElementById('weekendTopLineVal');
+      const pillsEl = document.getElementById('weekendLinePills');
+      const tbody = document.getElementById('weekendMissedBody');
+      const panel = document.getElementById('weekend-missed-panel');
+
+      if (panel) panel.classList.toggle('loading', weekendLoading);
+      if (metaEl && weekendLoading) metaEl.textContent = 'Loading missed calls day by day…';
+      if (!weekendMissedRows.length && !weekendLoading) {
+        if (countEl) countEl.textContent = '--';
+        if (totalEl) totalEl.textContent = '--';
+        if (satEl) satEl.textContent = '--';
+        if (sunEl) sunEl.textContent = '--';
+        if (topEl) topEl.textContent = '--';
+        if (pillsEl) pillsEl.innerHTML = '';
+        if (tbody) tbody.innerHTML = '<tr><td colspan="7" class="empty-state" style="padding:20px;">Load a weekend range to see missed calls</td></tr>';
+        return;
+      }
+
+      const byLine = summariseWeekendByLine(weekendMissedRows);
+      const satCount = weekendMissedRows.filter(r => londonWeekday(r.date) === 6).length;
+      const sunCount = weekendMissedRows.filter(r => londonWeekday(r.date) === 0).length;
+
+      if (countEl) countEl.textContent = weekendMissedRows.length;
+      if (totalEl) totalEl.textContent = weekendMissedRows.length;
+      if (satEl) satEl.textContent = satCount;
+      if (sunEl) sunEl.textContent = sunCount;
+      if (topEl) topEl.textContent = byLine.length ? byLine[0][0] : 'None';
+      if (metaEl && !weekendLoading) {
+        metaEl.textContent = `${weekendRangeLabel} · ${weekendMissedRows.length} missed inbound call${weekendMissedRows.length === 1 ? '' : 's'}`;
+      }
+      if (pillsEl) {
+        pillsEl.innerHTML = byLine.map(([line, count]) =>
+          `<span class="missed-garage-pill">${line} <span>${count}</span></span>`
+        ).join('');
+      }
+      if (tbody) {
+        tbody.innerHTML = weekendMissedRows.map(r => {
+          const opts = WEEKEND_CALLBACK_OPTIONS.map(o =>
+            `<option value="${o}"${r.status === o ? ' selected' : ''}>${o}</option>`
+          ).join('');
+          return `<tr data-weekend-key="${r.key}">
+            <td class="cell-mono">${r.dateLabel}</td>
+            <td class="cell-mono">${r.time}</td>
+            <td class="cell-strong">${r.line}</td>
+            <td>${r.garage}</td>
+            <td class="cell-mono">${r.caller}</td>
+            <td class="cell-mono">${r.ringTime}</td>
+            <td><select class="weekend-status-select" data-weekend-key="${r.key}">${opts}</select></td>
+          </tr>`;
+        }).join('');
+      }
+    }
+
+    async function loadWeekendMissedReport() {
+      if (weekendLoading) return;
+      weekendLoading = true;
+      renderWeekendMissedPanel();
+
+      try {
+        const customWrap = document.getElementById('weekendCustomDates');
+        const customStart = document.getElementById('weekendDateStart')?.value || '';
+        const customEnd = document.getElementById('weekendDateEnd')?.value || '';
+        if (weekendPreset === 'custom' && (!customStart || !customEnd)) {
+          showToast('Choose a start and end date');
+          return;
+        }
+
+        const range = await getWeekendDateRangeClient(weekendPreset, customStart, customEnd);
+        weekendRangeLabel = `${range.label} (${range.dates.join(', ')})`;
+        const calls = await fetchWeekendMissedCallsForDates(range.dates);
+        weekendMissedRows = buildWeekendMissedRows(calls);
+        renderWeekendMissedPanel();
+        if (!weekendMissedRows.length) showToast('No missed calls in that range');
+      } catch (e) {
+        showToast('Could not load weekend report');
+        debug('Weekend report failed: ' + (e && e.message ? e.message : e));
+      } finally {
+        weekendLoading = false;
+        renderWeekendMissedPanel();
+      }
+    }
+
+    async function emailWeekendMissedReport() {
+      if (isDemoMode) {
+        showToast('Email reports require live API mode');
+        return;
+      }
+      showToast('Sending weekend report…');
+      const customStart = document.getElementById('weekendDateStart')?.value || '';
+      const customEnd = document.getElementById('weekendDateEnd')?.value || '';
+      const statusByKey = loadWeekendCallbackStatuses();
+      try {
+        const res = await fetch('/api/weekend-missed', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            preset: weekendPreset,
+            customStart: weekendPreset === 'custom' ? customStart : undefined,
+            customEnd: weekendPreset === 'custom' ? customEnd : undefined,
+            deliver: true,
+            statusByKey
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Request failed');
+        if (data.email && data.email.skipped) {
+          showToast('Report generated — configure REPORT_EMAIL_* in Netlify to send email');
+        } else {
+          showToast(`Report sent · ${data.total} missed calls`);
+        }
+        if (data.rows) {
+          weekendMissedRows = data.rows.map(r => ({ ...r, status: r.status || statusByKey[r.key] || 'Not contacted' }));
+          weekendRangeLabel = data.rangeLabel || weekendRangeLabel;
+          renderWeekendMissedPanel();
+        }
+      } catch (e) {
+        showToast('Could not send report: ' + (e.message || 'error'));
+      }
+    }
+
+    function updateLastUpdated(fromCache, savedAt) {
       const el = document.getElementById('lastUpdated');
-      const now = new Date();
+      if (!el) return;
+      const now = fromCache && savedAt ? new Date(savedAt) : new Date();
       const p = getLondonParts(now);
+      if (fromCache) {
+        el.textContent = `Showing last numbers · ${p.hour}:${p.minute}:${p.second} · refreshing...`;
+        el.classList.remove('fresh');
+        el.classList.add('stale');
+        return;
+      }
       el.textContent = `Last updated: ${p.hour}:${p.minute}:${p.second}`;
+      el.classList.remove('stale');
       el.classList.add('fresh');
       setTimeout(() => el.classList.remove('fresh'), 3000);
+      saveDashboardSnapshot();
     }
 
     function addTickerEvent(call, label) {
@@ -4675,27 +5284,33 @@
 
         const nextToday = await getCallsByDate(0);
         if (Array.isArray(nextToday)) {
-          const todayKey = fingerprintCalls(nextToday);
+          const mergedToday = mergeCallRecords(todayCalls, nextToday);
+          const todayKey = fingerprintCalls(mergedToday);
           if (prevToday.length > 0 && todayKey !== uiSnapshots.todayKey) {
-            findNewCalls(prevToday, nextToday).forEach(c => {
+            findNewCalls(prevToday, mergedToday).forEach(c => {
               const dir = normaliseDirection(c);
               const label = dir === 'IU' ? 'Missed call' : dir === 'OUT' ? 'Outgoing call' : 'Incoming call';
               addTickerEvent(c, label);
             });
           }
-          todayCalls = nextToday;
+          todayCalls = mergedToday;
           uiSnapshots.todayKey = todayKey;
+          ingestCallsIntoArchive(todayCalls);
+          refreshHistoricalUi(false);
         }
 
         const nextYesterday = await getCallsByDate(-1);
         if (Array.isArray(nextYesterday)) {
-          yesterdayCalls = nextYesterday;
-          uiSnapshots.yesterdayKey = fingerprintCalls(nextYesterday);
+          yesterdayCalls = mergeCallRecords(yesterdayCalls, nextYesterday);
+          uiSnapshots.yesterdayKey = fingerprintCalls(yesterdayCalls);
+          ingestCallsIntoArchive(yesterdayCalls);
+          refreshHistoricalUi(false);
         }
 
         fortnightCalls = await getFortnightCalls(false);
         ingestCallsIntoArchive(mergeCallRecords(todayCalls, yesterdayCalls, fortnightCalls));
 
+        showingCachedNumbers = false;
         refreshHistoricalUi(force);
         updateLastUpdated();
       } finally {
@@ -4787,6 +5402,29 @@
       if (tr) selectRecorderDate(tr.dataset.date);
     });
 
+    document.getElementById('weekendPresetBtns').addEventListener('click', e => {
+      const btn = e.target.closest('.weekend-preset-btn');
+      if (!btn) return;
+      weekendPreset = btn.dataset.preset || 'last-weekend';
+      document.querySelectorAll('.weekend-preset-btn').forEach(b => {
+        b.classList.toggle('active', b === btn);
+      });
+      const customWrap = document.getElementById('weekendCustomDates');
+      if (customWrap) customWrap.hidden = weekendPreset !== 'custom';
+    });
+
+    document.getElementById('weekendLoadBtn').addEventListener('click', loadWeekendMissedReport);
+    document.getElementById('weekendCsvBtn').addEventListener('click', downloadWeekendCsv);
+    document.getElementById('weekendEmailBtn').addEventListener('click', emailWeekendMissedReport);
+
+    document.getElementById('weekendMissedBody').addEventListener('change', e => {
+      const sel = e.target.closest('.weekend-status-select');
+      if (!sel) return;
+      saveWeekendCallbackStatus(sel.dataset.weekendKey, sel.value);
+      const row = weekendMissedRows.find(r => r.key === sel.dataset.weekendKey);
+      if (row) row.status = sel.value;
+    });
+
     document.getElementById('viewFullHistoryBtn').addEventListener('click', openCallHistory);
     document.getElementById('historyOverlayClose').addEventListener('click', closeCallHistory);
     document.getElementById('historyOverlay').addEventListener('click', e => {
@@ -4823,13 +5461,24 @@
     // INIT
     // ============================================================
     async function init() {
+      getWeekendDateRangeClient('last-weekend').then(range => {
+        const startInput = document.getElementById('weekendDateStart');
+        const endInput = document.getElementById('weekendDateEnd');
+        if (startInput && range.dates.length) startInput.value = range.dates[0];
+        if (endInput && range.dates.length) endInput.value = range.dates[range.dates.length - 1];
+      }).catch(() => {});
+
       if (DEMO_MODE) {
         activateDemoMode('Demo mode is enabled in the dashboard config.');
       } else {
+        applyDashboardSnapshot();
         await loadCallArchive();
-        if (archivedCalls.length) {
-          fortnightCalls = archivedCalls.slice();
+        if (hydrateCallsFromArchive()) {
           refreshHistoricalUi(true);
+          const snap = (() => {
+            try { return JSON.parse(localStorage.getItem(SNAPSHOT_KEY) || 'null'); } catch (e) { return null; }
+          })();
+          updateLastUpdated(true, snap && snap.savedAt);
         }
         startPolling();
       }
