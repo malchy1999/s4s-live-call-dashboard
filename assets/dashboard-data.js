@@ -1284,52 +1284,58 @@
       const merged = isDemoMode
         ? mergeCallRecords(fortnight || [], demoTodayCalls || [], demoYesterdayCalls || [])
         : getAllKnownCalls();
+      const todayPool = isDemoMode ? demoTodayCalls : todayCalls;
       const periodDays = recorderPeriodDays;
       const dayLabels = buildDayLabels(0, periodDays);
       const todayStr = getLondonDateString(0);
       const viewDate = recorderSelectedDate || todayStr;
 
+      function callsForDate(dateStr) {
+        if (dateStr === todayStr) return todayPool || [];
+        return filterCallsInLabels(merged, [dateStr]);
+      }
+
+      function inboundTotalForDate(dateStr) {
+        const dayCalls = callsForDate(dateStr);
+        if (dateStr === todayStr) return processCallsData(dayCalls).inbound;
+        return dayCalls.filter(isInboundCall).length;
+      }
+
       const lineTotals = {};
       RECORDER_LINES.forEach(line => { lineTotals[line.name] = 0; });
 
       const dailyRows = dayLabels.map(dateStr => {
-        const dayCalls = filterCallsInLabels(merged, [dateStr]);
+        const dayCalls = callsForDate(dateStr);
         const counts = {};
-        let total = 0;
         RECORDER_LINES.forEach(line => {
           counts[line.name] = countRecorderLineCalls(dayCalls, line);
           lineTotals[line.name] += counts[line.name];
-          total += counts[line.name];
         });
         return {
           date: dateStr,
           counts,
-          total,
+          total: inboundTotalForDate(dateStr),
           isToday: dateStr === todayStr,
           isSelected: dateStr === viewDate
         };
       });
 
+      const viewCalls = callsForDate(viewDate);
       const viewCounts = {};
       RECORDER_LINES.forEach(line => {
-        viewCounts[line.name] = countRecorderLineCalls(
-          filterCallsInLabels(merged, [viewDate]),
-          line
-        );
+        viewCounts[line.name] = countRecorderLineCalls(viewCalls, line);
       });
-      const viewTotal = Object.values(viewCounts).reduce((a, b) => a + b, 0);
+      const viewTotal = inboundTotalForDate(viewDate);
       const overallTotal = dailyRows.reduce((sum, row) => sum + row.total, 0);
 
       const loadedDayLabels = buildDayLabels(0, RECORDER_MAX_DAYS);
       const calendarTotals = {};
       merged.forEach(c => {
         if (!isInboundCall(c)) return;
-        const ddi = findDdiForCall(c);
-        if (!ddi) return;
-        if (!RECORDER_LINES.some(line => line.ddiKeys.includes(ddi.ddi))) return;
         const d = getCallDate(getCallDateField(c));
         if (d) calendarTotals[d] = (calendarTotals[d] || 0) + 1;
       });
+      calendarTotals[todayStr] = inboundTotalForDate(todayStr);
       loadedDayLabels.forEach(dateStr => {
         if (calendarTotals[dateStr] == null) calendarTotals[dateStr] = 0;
       });

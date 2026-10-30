@@ -817,6 +817,9 @@
       value: viewCounts[line.name] || 0,
       colour: recorderColour(line.name)
     })).filter(s => s.value > 0);
+    const assigned = slices.reduce((sum, s) => sum + s.value, 0);
+    const other = viewTotal - assigned;
+    if (other > 0) slices.push({ name: 'Other numbers', value: other, colour: '#8a9aa8' });
     if (!viewTotal || !slices.length) {
       svg.innerHTML = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#eef2f6"/><text x="${cx}" y="${cy + 4}" text-anchor="middle" fill="#4d6274" font-size="12" font-family="Lato,system-ui,sans-serif">No calls</text>`;
       legend.innerHTML = '<span class="recorder-legend-item" style="color:var(--muted)">No inbound calls on this day</span>';
@@ -857,7 +860,11 @@
       name: line.name,
       value: viewCounts[line.name] || 0,
       colour: recorderColour(line.name)
-    })).sort((a, b) => b.value - a.value);
+    }));
+    const assigned = rows.reduce((sum, r) => sum + r.value, 0);
+    const other = viewTotal - assigned;
+    if (other > 0) rows.push({ name: 'Other numbers', value: other, colour: '#8a9aa8' });
+    rows.sort((a, b) => b.value - a.value);
     const peak = Math.max(...rows.map(r => r.value), 1);
     el.innerHTML = rows.map(row => {
       const width = row.value > 0 ? Math.max((row.value / peak) * 100, 4) : 0;
