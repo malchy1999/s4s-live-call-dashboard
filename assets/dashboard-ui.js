@@ -13,6 +13,9 @@
     'Garages24': '#3646c8',
     'Customer 24': '#6f8294',
     'Night service': '#24324a',
+    '0808 National': '#fed53f',
+    'A1 0808': '#7a5a00',
+    'AI ads': '#10b981',
     'Leeds': '#cf3b2e',
     'South-east': '#12a4bd',
     'Midlands': '#6aa61c',
@@ -60,7 +63,7 @@
   }
 
   function avatarTextColour(bg) {
-    if (bg === '#e6a117' || bg === '#9aa31a') return '#122e47';
+    if (bg === '#e6a117' || bg === '#9aa31a' || bg === '#fed53f') return '#122e47';
     return '#fff';
   }
 

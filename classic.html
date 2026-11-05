@@ -2560,6 +2560,9 @@
       { name: 'Garages24',  number: '01932503647', ddi: '+441932503647-garages24', groups: ['garages24.service4@4com.im'] },
       { name: 'Customer 24', number: '01932503647', ddi: '+441932503647-customer24', groups: ['customer24.service4@4com.im'] },
       { name: 'Night service', number: '01932503647', ddi: '+441932503647-night', groups: ['nightservice.service4@4com.im'] },
+      { name: '0808 National', number: '08081640418', ddi: '+448081640418', groups: [] },
+      { name: 'A1 0808', number: '08085034208', ddi: '+448085034208', groups: [] },
+      { name: 'AI ads', number: '01483397592', ddi: '+441483397592', groups: [] },
       { name: 'Leeds',      number: '01133231775', ddi: '+441133231775', groups: ['leedsincoming.service4@4com.im'] },
       { name: 'South-east', number: '01580239610', ddi: '+441580239610', groups: ['weybridgeincoming1.service4@4com.im', 'cranbrookincoming.service4@4com.im'] },
       { name: 'Midlands',   number: '01922666376', ddi: '+441922666376', groups: ['walsallincoming.service4@4com.im'] },
@@ -2579,6 +2582,9 @@
     const RECORDER_MAX_DAYS = 30;
     const RECORDER_LINES = [
       { name: 'Main', number: '01932503647', ddiKeys: ['+441932503647-gearbox', '+441932503647-existing', '+441932503647-garages24', '+441932503647-customer24', '+441932503647-night'] },
+      { name: '0808 National', number: '08081640418', ddiKeys: ['+448081640418'] },
+      { name: 'A1 0808', number: '08085034208', ddiKeys: ['+448085034208'] },
+      { name: 'AI ads', number: '01483397592', ddiKeys: ['+441483397592'] },
       { name: 'A1', number: '01767669575', ddiKeys: ['+441767669575'] },
       { name: 'Beds', number: '01582320570', ddiKeys: ['+441582320570'] },
       { name: 'Manchester', number: '01616740142', ddiKeys: ['+441616740142'] },
@@ -2654,6 +2660,9 @@
       '+441932503647-garages24': 'Main',
       '+441932503647-customer24': 'Main',
       '+441932503647-night': 'Main',
+      '+448081640418': '0808 National',
+      '+448085034208': 'A1 0808',
+      '+441483397592': 'AI ads',
       '+441767669575': 'A1',
       '+441582320570': 'Beds',
       '+441616740142': 'Manchester',
@@ -3081,12 +3090,17 @@
 
     function matchDdiByNumber(val) {
       if (!val) return null;
-      const n = val.replace(/\s/g, '');
-      return DDI_LIST.find(d =>
-        n.includes(d.number) ||
-        n.includes(d.ddi.replace('+', '')) ||
-        d.ddi.includes(n)
-      ) || null;
+      const n = String(val).replace(/\s/g, '');
+      const digits = n.replace(/\D/g, '');
+      const national = digits.startsWith('44') ? '0' + digits.slice(2) : digits;
+      return DDI_LIST.find(d => {
+        const ddiDigits = String(d.ddi).replace(/\D/g, '');
+        return n.includes(d.number) ||
+          n.includes(d.ddi.replace('+', '')) ||
+          d.ddi.includes(n) ||
+          national === d.number ||
+          digits === ddiDigits;
+      }) || null;
     }
 
     function matchDdiByGroup(group) {
