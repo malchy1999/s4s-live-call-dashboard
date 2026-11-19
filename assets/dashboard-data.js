@@ -103,6 +103,7 @@
     const POLL_INTERVAL_MS = 30000;
     const FORTNIGHT_TTL_MS = 5 * 60 * 1000;
     let lastFortnightFetchAt = 0;
+    let lastMorningBackfillAt = 0;
     let fortnightFetchDays = 0;
     let recorderPeriodDays = 14;
     let recorderSelectedDate = null;
@@ -411,7 +412,8 @@
         timeZone: 'Europe/London',
         year: 'numeric', month: '2-digit', day: '2-digit',
         hour: '2-digit', minute: '2-digit', second: '2-digit',
-        hour12: false
+        hour12: false,
+        hourCycle: 'h23'
       });
       const parts = {};
       fmt.formatToParts(date).forEach(p => { if (p.type !== 'literal') parts[p.type] = p.value; });
@@ -819,6 +821,54 @@
       }
     }
 
+    async function fetchCallsForWindow(offsetDays, startTime, endTime) {
+      const ds = getLondonDateString(offsetDays || 0);
+      const body = {
+        StartDate: `${ds} ${startTime}`,
+        EndDate: `${ds} ${endTime}`,
+        Directions: 'INC,IU,OUT'
+      };
+      const data = await queuedFetch('GetCallsByDate', 'POST', body);
+      return tollringRecords(data);
+    }
+
+    async function completeDayCalls(offsetDays, records) {
+      let all = records || [];
+      if (all.length >= 900) {
+        const chunks = [
+          ['00:00:00', '05:59:59'],
+          ['06:00:00', '11:59:59'],
+          ['12:00:00', '17:59:59'],
+          ['18:00:00', '23:59:59']
+        ];
+        for (const [start, end] of chunks) {
+          all = mergeCallRecords(all, await fetchCallsForWindow(offsetDays, start, end));
+        }
+        return all;
+      }
+
+      if (offsetDays !== 0) return all;
+
+      const known = mergeCallRecords(
+        all,
+        todayCalls,
+        (archivedCalls || []).filter(c => getCallDate(getCallDateField(c)) === getLondonDateString(0))
+      );
+      const hours = bucketByHour(known);
+      const nowH = parseInt(getLondonParts(new Date()).hour, 10);
+      if (Number.isNaN(nowH) || nowH < 8) return all;
+      const gapEnd = Math.min(nowH, 11);
+      let morningMissing = false;
+      for (let h = 8; h < gapEnd; h++) {
+        if (!hours[h]) morningMissing = true;
+      }
+      if (!morningMissing) return all;
+      if (Date.now() - lastMorningBackfillAt < FORTNIGHT_TTL_MS) return all;
+      lastMorningBackfillAt = Date.now();
+      all = mergeCallRecords(all, await fetchCallsForWindow(0, '00:00:00', `${String(gapEnd).padStart(2, '0')}:00:00`));
+      return all;
+    }
+
     async function getCallsByDate(offsetDays) {
       if (isDemoMode) return offsetDays === -1 ? demoYesterdayCalls : demoTodayCalls;
       const range = getDateRange(offsetDays || 0);
@@ -832,7 +882,7 @@
         }
         hideError();
         hideSetupPanel();
-        return tollringRecords(data);
+        return completeDayCalls(offsetDays || 0, tollringRecords(data));
       } catch (e) {
         handleApiFailure('GetCallsByDate', e);
         const cached = offsetDays === -1 ? lastKnownData.yesterday : lastKnownData.today;
@@ -1111,19 +1161,35 @@
     // ============================================================
     function getCallHour(callDate) {
       if (!callDate) return null;
-      const str = String(callDate);
-      let timePart = '';
-      if (str.includes('T')) {
-        timePart = str.split('T')[1];
-      } else if (str.includes(' ')) {
-        timePart = str.split(' ')[1];
-      } else {
-        const match = str.match(/(\d{2}):(\d{2})/);
-        return match ? parseInt(match[1], 10) : null;
+      const str = String(callDate).trim();
+      if (!str) return null;
+
+      const hasTz = /Z$|[+-]\d{2}:?\d{2}$/i.test(str.replace(/\s+(AM|PM)$/i, ''));
+      if (hasTz) {
+        const iso = str.includes('T') ? str : str.replace(' ', 'T');
+        const parsed = new Date(iso);
+        if (!Number.isNaN(parsed.getTime())) {
+          const h = parseInt(getLondonParts(parsed).hour, 10);
+          if (!Number.isNaN(h) && h >= 0 && h < 24) return h;
+        }
       }
-      if (!timePart) return null;
-      const hour = parseInt(timePart.split(':')[0], 10);
-      return Number.isNaN(hour) ? null : hour;
+
+      const match = str.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?(?:\.\d+)?\s*(AM|PM)?/i);
+      if (!match) return null;
+      let hour = parseInt(match[1], 10);
+      if (Number.isNaN(hour)) return null;
+      const ampm = (match[4] || '').toUpperCase();
+      if (ampm === 'PM' && hour < 12) hour += 12;
+      if (ampm === 'AM' && hour === 12) hour = 0;
+      return hour >= 0 && hour < 24 ? hour : null;
+    }
+
+    function getCallHourFromRecord(call) {
+      if (!call) return null;
+      return getCallHour(
+        getCallDateField(call) ||
+        call.Call_time || call.CallTime || call.Start_time || call.StartTime || call.Time || ''
+      );
     }
 
     function normaliseDirection(call) {
@@ -1191,7 +1257,7 @@
     function bucketByHour(calls) {
       const buckets = new Array(24).fill(0);
       calls.forEach(c => {
-        const hour = getCallHour(c.Call_date);
+        const hour = getCallHourFromRecord(c);
         if (hour !== null && hour >= 0 && hour < 24) buckets[hour]++;
       });
       return buckets;
@@ -1203,7 +1269,7 @@
       calls.forEach(c => {
         const ddi = findDdiForCall(c);
         if (!ddi) return;
-        const hour = getCallHour(c.Call_date);
+        const hour = getCallHourFromRecord(c);
         if (hour !== null && hour >= 0 && hour < 24) buckets[ddi.ddi][hour]++;
       });
       return buckets;
@@ -2085,6 +2151,7 @@
       getLondonParts,
       getLondonDateString,
       getCallHour,
+      getCallHourFromRecord,
       callRecordKey,
       fingerprintLive,
       fingerprintCalls,

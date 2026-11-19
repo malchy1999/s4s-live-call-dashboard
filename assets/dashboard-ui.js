@@ -317,7 +317,7 @@
         html += `<text x="${x}" y="${H - 8}" fill="#4d6274" font-size="8" text-anchor="middle" font-family="Lato,system-ui,sans-serif">${escapeHtml(g.formatDayLabel(label))}</text>`;
       });
     } else {
-      [0, 4, 8, 12, 16, 20].forEach(h => {
+      [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22].forEach(h => {
         const x = padL + (h / xDivisor) * chartW;
         html += `<text x="${x}" y="${H - 8}" fill="#4d6274" font-size="9" text-anchor="middle" font-family="Lato,system-ui,sans-serif">${String(h).padStart(2, '0')}:00</text>`;
       });
@@ -488,7 +488,7 @@
   function waitingSince(call) {
     const g = G();
     const dateStr = g.getCallDate(g.getCallDateField(call));
-    const m = String(call.Call_date || '').match(/(\d{2}):(\d{2}):(\d{2}|\d{2})/);
+    const m = String(g.getCallDateField(call) || call.Call_date || '').match(/(\d{1,2}):(\d{2})(?::(\d{2}))?/);
     if (!dateStr || !m) return { label: '--', cls: 'mute', mins: 0 };
     const now = g.getLondonParts(new Date());
     const then = new Date(`${dateStr}T${m[1]}:${m[2]}:${m[3] || '00'}+00:00`);
@@ -538,7 +538,7 @@
     pending.forEach(c => {
       const w = waitingSince(c);
       const mins = typeof w.mins === 'number' ? w.mins : 0;
-      if (!oldest || mins > oldest.mins) oldest = { w, mins, time: (String(c.Call_date || '').match(/(\d{2}:\d{2})/) || [])[1] };
+      if (!oldest || mins > oldest.mins) oldest = { w, mins, time: (String(g.getCallDateField(c) || c.Call_date || '').match(/(\d{1,2}:\d{2})/) || [])[1] };
     });
 
     if (statsEl) {
@@ -569,7 +569,7 @@
       const st = statuses[key] || 'To call back';
       const cb = missedCallbackLabel(st);
       const wait = st === 'Called back' ? { label: 'Done', cls: 'ok' } : waitingSince(c);
-      const timeMatch = (c.Call_date || '').match(/(\d{2}:\d{2})/);
+      const timeMatch = String(g.getCallDateField(c) || c.Call_date || '').match(/(\d{1,2}:\d{2})/);
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td><strong>${escapeHtml(timeMatch ? timeMatch[1] : '--:--')}</strong></td>
@@ -622,7 +622,7 @@
     visible.forEach(c => {
       const ddi = g.findDdiForCall(c);
       const dateStr = g.getCallDate(g.getCallDateField(c));
-      const timeMatch = (c.Call_date || '').match(/(\d{2}:\d{2})/);
+      const timeMatch = String(g.getCallDateField(c) || c.Call_date || '').match(/(\d{1,2}:\d{2})/);
       const dir = g.normaliseDirection(c);
       let chip = { cls: 'in', text: 'Inbound' };
       if (dir === 'OUT') chip = { cls: 'out', text: 'Outbound' };
@@ -1041,7 +1041,7 @@
     visible.forEach(c => {
       const ddi = g.findDdiForCall(c);
       const dateStr = g.getCallDate(g.getCallDateField(c));
-      const timeMatch = String(c.Call_date || '').match(/(\d{2}:\d{2})/);
+      const timeMatch = String(g.getCallDateField(c) || c.Call_date || '').match(/(\d{1,2}:\d{2})/);
       const dir = g.normaliseDirection(c);
       const type = g.historyTypeLabel(dir);
       const tr = document.createElement('tr');
