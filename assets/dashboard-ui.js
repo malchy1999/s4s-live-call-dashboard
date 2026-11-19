@@ -317,7 +317,7 @@
         html += `<text x="${x}" y="${H - 8}" fill="#4d6274" font-size="8" text-anchor="middle" font-family="Lato,system-ui,sans-serif">${escapeHtml(g.formatDayLabel(label))}</text>`;
       });
     } else {
-      [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22].forEach(h => {
+      [0, 6, 8, 9, 10, 11, 12, 14, 16, 18].forEach(h => {
         const x = padL + (h / xDivisor) * chartW;
         html += `<text x="${x}" y="${H - 8}" fill="#4d6274" font-size="9" text-anchor="middle" font-family="Lato,system-ui,sans-serif">${String(h).padStart(2, '0')}:00</text>`;
       });
@@ -596,11 +596,14 @@
 
   function renderRecent(force) {
     const g = G();
-    const calls = g.getAllKnownCalls().filter(c => {
+    const todayStr = g.getLondonDateString(0);
+    const calls = (g.todayCalls || []).filter(c => {
+      const dateStr = g.getCallDate(g.getCallDateField(c));
+      if (dateStr && dateStr !== todayStr) return false;
       const dir = g.normaliseDirection(c);
       if (state.recentFilter === 'all') return true;
       return dir === state.recentFilter;
-    }).sort((a, b) => (b.Call_date || '').localeCompare(a.Call_date || ''));
+    }).sort((a, b) => (g.getCallTimestampMs ? g.getCallTimestampMs(b) - g.getCallTimestampMs(a) : 0) || String(b.Call_date || '').localeCompare(String(a.Call_date || '')));
     const visible = calls.slice(0, state.recentShow);
     const key = state.recentFilter + state.recentShow + calls.length;
     if (!force && state.renderKeys.recent === key) return;
